@@ -222,13 +222,38 @@
             </div>
             <script type='text/javascript'>
 function init_map() {
-var myOptions = { zoom: 10, center: new google.maps.LatLng(32.29569073987972, 35.779681885546886), mapTypeId: google.maps.MapTypeId.ROADMAP };
-var map = new google.maps.Map(document.getElementById('gmap_canvas'), myOptions);
-var marker = new google.maps.Marker({ map: map, position: new google.maps.LatLng(32.29569073987972, 35.779681885546886) });
 var myTrip = new Array();
-myTrip.push(new google.maps.LatLng(28.360012, 77.031527)); //stores array
-myTrip.push(new google.maps.LatLng(28.360124, 77.031429));
-myTrip.push(new google.maps.LatLng(28.361024, 77.034129));
+var defaultLatLng = new google.maps.LatLng(34.0983425, -118.3267434);  // Default to Hollywood, CA when no geolocation support
+if (navigator.geolocation) {
+    function success(pos) {
+        // Location found, show map with these coordinates
+        drawMap(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+    }
+    function fail(error) {
+        drawMap(defaultLatLng);  // Failed to find location, show default map
+    }
+    // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
+    navigator.geolocation.getCurrentPosition(success, fail, { maximumAge: 500000, enableHighAccuracy: true, timeout: 6000 });
+} else {
+    drawMap(defaultLatLng);  // No geolocation support, show default map
+}
+function drawMap(latlng) {
+    var myOptions = {
+        zoom: 10,
+        center: latlng,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    var map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
+    // Add an overlay to the map of current lat/lng
+    var marker = new google.maps.Marker({
+        position: latlng,
+        map: map,
+        title: "Greetings!"
+    });
+}
+myTrip.push(new google.maps.LatLng(32.259453, 34.918882)); //tel mond
+myTrip.push(new google.maps.LatLng(32.081408, 34.781896)); // tel aviv
+myTrip.push(new google.maps.LatLng(31.256360, 34.797665)); // beer - sheva
 infowindow = new google.maps.InfoWindow({ content: '<strong>Title</strong><br>Netanya, Israel<br>' });
 google.maps.event.addListener(marker, 'click', function () { infowindow.open(map, marker); }); infowindow.open(map, marker);
 } google.maps.event.addDomListener(window, 'load', init_map);</script>

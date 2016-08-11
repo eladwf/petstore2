@@ -158,21 +158,6 @@
         <br /><br />
             <fieldset data-role="fieldcontain" style="border: 1px solid black; padding: 5px;">
                 <legend>Please Login</legend>
-                <script src='https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDMvuJFvCghEamrQNgQ68q3f6mYFNRpA1Q'></script><div style='overflow:hidden;height:440px;width:700px;'><div id='gmap_canvas' style='height:440px;width:700px;'></div><div><small><a href="http://embedgooglemaps.com">									embed google maps							</a></small></div>
-                <style>
-                    #gmap_canvas img {
-                        max-width: none !important;
-                        background: none !important;
-                    }
-                </style></div>
-                <script type='text/javascript'>function init_map() {
-var myOptions = { zoom: 10, center: new google.maps.LatLng(32.29569073987972, 35.779681885546886), mapTypeId: google.maps.MapTypeId.ROADMAP };
-var map = new google.maps.Map(document.getElementById('gmap_canvas'), myOptions);
-var marker = new google.maps.Marker({ map: map, position: new google.maps.LatLng(32.29569073987972, 35.779681885546886) });
-infowindow = new google.maps.InfoWindow({ content: '<strong>Title</strong><br>Netanya, Israel<br>' });
-google.maps.event.addListener(marker, 'click', function () { infowindow.open(map, marker); }); infowindow.open(map, marker);
-} google.maps.event.addDomListener(window, 'load', init_map);</script>
-
                 <label for="LPName">Name:</label>
                 <input type="text" id="LPName" name="text" placeholder="insert your name..." />
                 <label for="LPPassword">Password:</label>
@@ -195,6 +180,8 @@ google.maps.event.addListener(marker, 'click', function () { infowindow.open(map
                     <li><a href="#AboutPage" class="ui-state-persist">About</a></li>
                     <li><a href="#OrderPage">Order</a></li>
                     <li><a href="#UserPage">User</a></li>
+                    <li><a href="#MapPage">Map page</a></li>
+
                 </ul>
             </div>
         </div>
@@ -210,6 +197,48 @@ google.maps.event.addListener(marker, 'click', function () { infowindow.open(map
         </div>
     </div>
 
+    <!--the Map page-->
+    <div data-role="page" id="MapPage" data-theme="a">
+        <div data-role="header">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#AboutPage" class="ui-state-persist">About</a></li>
+                    <li><a href="#OrderPage">Order</a></li>
+                    <li><a href="#UserPage">User</a></li>
+                    <li><a href="#MapPage">Map page</a></li>
+
+                </ul>
+            </div>
+        </div>
+        <div data-role="content">
+            <script src='https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDMvuJFvCghEamrQNgQ68q3f6mYFNRpA1Q'></script><div style='overflow:hidden;height:440px;width:700px;'>
+                <div id='gmap_canvas' style='height:440px;width:700px;'></div><div><small><a href="http://embedgooglemaps.com">									embed google maps							</a></small></div>
+                <style>
+                    #gmap_canvas img {
+                        max-width: none !important;
+                        background: none !important;
+                    }
+                </style>
+            </div>
+            <script type='text/javascript'>
+function init_map() {
+var myOptions = { zoom: 10, center: new google.maps.LatLng(32.29569073987972, 35.779681885546886), mapTypeId: google.maps.MapTypeId.ROADMAP };
+var map = new google.maps.Map(document.getElementById('gmap_canvas'), myOptions);
+var marker = new google.maps.Marker({ map: map, position: new google.maps.LatLng(32.29569073987972, 35.779681885546886) });
+var myTrip = new Array();
+myTrip.push(new google.maps.LatLng(28.360012, 77.031527)); //stores array
+myTrip.push(new google.maps.LatLng(28.360124, 77.031429));
+myTrip.push(new google.maps.LatLng(28.361024, 77.034129));
+infowindow = new google.maps.InfoWindow({ content: '<strong>Title</strong><br>Netanya, Israel<br>' });
+google.maps.event.addListener(marker, 'click', function () { infowindow.open(map, marker); }); infowindow.open(map, marker);
+} google.maps.event.addDomListener(window, 'load', init_map);</script>
+
+        </div>
+        <div data-role="footer" data-position="fixed" data-theme="d">
+            <h5>Gluten Free Shop &nbsp &copy; &nbsp Nir Chen</h5>
+        </div>
+    </div>
+
     <!--the order page-->
     <div data-role="page" id="OrderPage" data-theme="a">
         <div data-role="header">
@@ -218,6 +247,7 @@ google.maps.event.addListener(marker, 'click', function () { infowindow.open(map
                     <li><a href="#AboutPage" >About</a></li>
                     <li><a href="#OrderPage" class="ui-state-persist">Order</a></li>
                     <li><a href="#UserPage">User</a></li>
+                    <li><a href="#MapPage">Map page</a></li>
                 </ul>
             </div>
         </div>
@@ -289,6 +319,7 @@ google.maps.event.addListener(marker, 'click', function () { infowindow.open(map
                     <li><a href="#AboutPage" >About</a></li>
                     <li><a href="#OrderPage" >Order</a></li>
                     <li><a href="#UserPage" class="ui-state-persist">User</a></li>
+                    <li><a href="#MapPage">Map page</a></li>
                 </ul>
             </div>
         </div>

@@ -211,7 +211,7 @@
             </div>
         </div>
         <div data-role="content">
-            <script src='https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDMvuJFvCghEamrQNgQ68q3f6mYFNRpA1Q'></script><div style='overflow:hidden;height:440px;width:700px;'>
+            <script src='https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDMvuJFvCghEamrQNgQ68q3f6mYFNRpA1Q&libraries=geometry'></script><div style='overflow:hidden;height:440px;width:700px;'>
                 <div id='gmap_canvas' style='height:440px;width:700px;'></div><div><small><a href="http://embedgooglemaps.com">									embed google maps							</a></small></div>
                 <style>
                     #gmap_canvas img {
@@ -227,7 +227,9 @@ var defaultLatLng = new google.maps.LatLng(34.0983425, -118.3267434);  // Defau
 if (navigator.geolocation) {
     function success(pos) {
         // Location found, show map with these coordinates
-        drawMap(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+        var myloc = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+        drawMap(myloc);
+        calcdist(myloc);
     }
     function fail(error) {
         drawMap(defaultLatLng);  // Failed to find location, show default map
@@ -251,18 +253,40 @@ function drawMap(latlng) {
         title: "Greetings!"
     });
 }
-myTrip.push(new google.maps.LatLng(32.259453, 34.918882)); //tel mond
-myTrip.push(new google.maps.LatLng(32.081408, 34.781896)); // tel aviv
-myTrip.push(new google.maps.LatLng(31.256360, 34.797665)); // beer - sheva
+function calcdist(myloc) {
+    var telmond = new google.maps.LatLng(32.259453, 34.918882); //tel mond
+    var telaviv = new google.maps.LatLng(32.081408, 34.781896); // tel aviv
+    var beersheva = new google.maps.LatLng(31.256360, 34.797665); // beer - sheva
+    var disttelmond = google.maps.geometry.spherical.computeDistanceBetween(myloc, telmond);
+    var disttelaviv = google.maps.geometry.spherical.computeDistanceBetween(myloc, telaviv);
+    var distbeersheva = google.maps.geometry.spherical.computeDistanceBetween(myloc, beersheva);
+    var shortest = Math.min(disttelmond, disttelaviv, distbeersheva);
+    switch (shortest)
+    {
+        case disttelmond:
+            $('#BradAmount').text("shortest is telmond");
+            break;
+        case disttelaviv:
+            $('#BradAmount').text("shortest is telaviv");
+            break;
+        case distbeersheva:
+            $('#BradAmount').text("shortest is beer sheva");
+            break;
+    }
+}
 infowindow = new google.maps.InfoWindow({ content: '<strong>Title</strong><br>Netanya, Israel<br>' });
 google.maps.event.addListener(marker, 'click', function () { infowindow.open(map, marker); }); infowindow.open(map, marker);
 } google.maps.event.addDomListener(window, 'load', init_map);</script>
 
         </div>
-        <div data-role="footer" data-position="fixed" data-theme="d">
-            <h5>Gluten Free Shop &nbsp &copy; &nbsp Nir Chen</h5>
+        <div data-role="content">
+            <p style="text-align:center">
+                <span>Closest store: </span><span id="BradAmount">0</span><br />
+            </p>
+            <div data-role="footer" data-position="fixed" data-theme="d">
+                <h5>Gluten Free Shop &nbsp &copy; &nbsp Nir Chen</h5>
+            </div>
         </div>
-    </div>
 
     <!--the order page-->
     <div data-role="page" id="OrderPage" data-theme="a">

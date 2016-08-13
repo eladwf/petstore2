@@ -13,164 +13,46 @@
     </script>
     <script src="scripts/jquery.mobile-1.4.5.min.js"></script>
     <script type="text/javascript">
-        //_________________ LOGIN PAGE ________________
-        $(document).on("pageinit", "#LoginPage", function (event) {
-            forDebug();
-            wireEventsLoginPage();
-        });
+        function getadress() {
+            var address = [];
+            WebServiceURL = "ShopsWS.asmx";
+            $.support.cors = true;
+            $.ajax({
+                url: WebServiceURL + "/GetShopsAdress",
+                dataType: "json",
+                async: false,
+                type: "POST",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                error: function (err) {
+                    alert("errornir: " + JSON.stringify(err));
+                },
+                success: function (data) {
+                    if (data["d"] != undefined) {
+                        for (var i = 0; i < data["d"].length; i++)
+                            address.push(data["d"][i])
 
-        function forDebug() {
-            $('#LPName').val('avi'); 
-            $('#LPPassword').val('123');
-        } 
 
-        function wireEventsLoginPage() {
-            $('#LoginBtn').on('tap', function () {
-                if ($('#LPName').val().length == 3 && $('#LPPassword').val().length == 3) {
-                    if (typeof (Storage) !== "undefined") {
-                        sessionStorage.Sesname = $('#LPName').val();
-                        sessionStorage.SesPass = $('#LPPassword').val();
-                    }
-                    $.mobile.changePage('#AboutPage', { 'transition': 'flip' });
-                }
-                else {
-                    alert('wrong Name or Password');
-                }
-            });
-        }
-
-        //_________________ USER PAGE ________________
-        $(document).on("pageinit", "#UserPage", function (event) {
-            wireEventsUserPage();
-        });
-
-        function wireEventsUserPage() {
-            if (typeof (Storage) !== "undefined") {
-
-                if (sessionStorage.Sesname) {
-                    $('#UserName').text(sessionStorage.Sesname);
-                }
-                if (sessionStorage.SesPass) {
-                    $('#UserPass').text(sessionStorage.SesPass);
-                }
-            }
-
-            $('#UPShowDetailsBtn').on('tap', function () {
-                if (typeof (Storage) !== "undefined") {
-
-                    if (sessionStorage.Sesname) {
-                        alert(sessionStorage.Sesname);
-                        $('#UserName').text('bla');
-                    }
-                    if (sessionStorage.SesPass) {
-                        $('#UserPass').val(sessionStorage.SesPass);
                     }
                 }
             });
+
+            return address;
+        }
+        var getmin = function (values) {
+            if(values.length==0)
+                return -1;
+            var min=values[0];
+            for (var i = 1; i < values.length; i++)
+                if (min < values[i])
+                    min = values[i];
+            return min;
         }
 
-        //_________________ ORDER PAGE ________________
-        $(document).on("pageinit", "#OrderPage", function (event) {
-            wireEventsOrderPage();
-        });
-        var BradAmount = 0
-        var BunAmount = 0
-        var PastaAmount = 0
-        var Price=0;
-
-        function wireEventsOrderPage() {
-            $('#AddBrad').on('click', function () {
-                BradAmount++;
-                $('#BradAmount').text(BradAmount);
-                calculatePrice();
-            });
-            $('#RemoveBrad').on('click', function () {
-                if (BradAmount > 0) {
-                    BradAmount--;
-                }                
-                $('#BradAmount').text(BradAmount);
-                calculatePrice();
-            });
-
-            $('#AddBun').on('click', function () {
-                BunAmount++;
-                $('#BunAmount').text(BunAmount);
-                calculatePrice();
-            });
-            $('#RemoveBun').on('click', function () {
-                if (BunAmount > 0) {
-                    BunAmount--;
-                }
-                $('#BunAmount').text(BunAmount);
-                calculatePrice();
-            });
-
-            $('#AddPasta').on('click', function () {
-                PastaAmount++;
-                $('#PastaAmount').text(PastaAmount);
-                calculatePrice();
-            });
-            $('#RemovePasta').on('click', function () {
-                if (PastaAmount > 0) {
-                    PastaAmount--;
-                }
-                $('#PastaAmount').text(PastaAmount);
-                calculatePrice();
-            });
-
-            $('#payBtn').on('click', function () {
-                WebServiceURL = "OrderWS.asmx";
-                $.support.cors = true;
-                $.ajax({
-                    url: WebServiceURL + "/InsertOrder",
-                    dataType: "json",
-                    type: "POST",
-                    data: "{'UserName':'" + sessionStorage.Sesname + "'," +
-                            "'Price':'" + Price + "' }",
-                    contentType: "application/json; charset=utf-8",
-                    error: function (err) {
-                        alert("errornir: " + JSON.stringify(err));
-                    },
-                    success: function (data) {
-                        if (data["d"] == 1) {
-                            alert('SUCCESS: ' + data["d"] + ' rows');
-                        }
-                    }
-                });
-            });
-            
-        }
-
-        function calculatePrice() {
-            Price = 20 * BradAmount + 10 * BunAmount + 30 * PastaAmount;
-            $('#TotalPrice').text(Price);
-        }
 
     </script>
 </head>
 <body>
-    <!--the login page-->
-    <div data-role="page" id="LoginPage" data-theme="a">
-        <div data-role="header">
-            <h5>Welcome</h5>
-        </div>
-        <div data-role="content">
-        <br /><br />
-            <fieldset data-role="fieldcontain" style="border: 1px solid black; padding: 5px;">
-                <legend>Please Login</legend>
-                <label for="LPName">Name:</label>
-                <input type="text" id="LPName" name="text" placeholder="insert your name..." />
-                <label for="LPPassword">Password:</label>
-                <input type="text" id="LPPassword" name="number" placeholder="insert your password..." />
-                <div style="text-align:center">
-                    <a href="#" data-role="button" id="LoginBtn" data-mini="true" data-inline="true" data-icon="check" data-iconpos="bottom" >Login</a> 
-                </div>
-            </fieldset>
-        </div>
-        <div data-role="footer" data-position="fixed" data-theme="d">
-            <h5>Gluten Free Shop &nbsp &copy; &nbsp Nir Chen</h5>
-        </div>
-    </div>
 
     <!--the About page-->
     <div data-role="page" id="AboutPage" data-theme="a">
@@ -221,170 +103,114 @@
                 </style>
             </div>
             <script type='text/javascript'>
-function init_map() {
-var myTrip = new Array();
-var defaultLatLng = new google.maps.LatLng(34.0983425, -118.3267434);  // Default to Hollywood, CA when no geolocation support
-if (navigator.geolocation) {
-    function success(pos) {
-        // Location found, show map with these coordinates
-        var myloc = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-        drawMap(myloc);
-        calcdist(myloc);
-    }
-    function fail(error) {
-        drawMap(defaultLatLng);  // Failed to find location, show default map
-        $('#BradAmount').text("Couldn't get location");
-    }
-    // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
-    navigator.geolocation.getCurrentPosition(success, fail, { maximumAge: 500000, enableHighAccuracy: true, timeout: 6000 });
-} else {
-    drawMap(defaultLatLng);  // No geolocation support, show default map
-}
-function drawMap(latlng) {
-    var myOptions = {
-        zoom: 10,
-        center: latlng,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    var map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
-    // Add an overlay to the map of current lat/lng
-    var marker = new google.maps.Marker({
-        position: latlng,
-        map: map,
-        title: "Greetings!"
-    });
-}
-function calcdist(myloc) {
-    var telmond = new google.maps.LatLng(32.259453, 34.918882); //tel mond
-    var telaviv = new google.maps.LatLng(32.081408, 34.781896); // tel aviv
-    var beersheva = new google.maps.LatLng(31.256360, 34.797665); // beer - sheva
-    var disttelmond = google.maps.geometry.spherical.computeDistanceBetween(myloc, telmond);
-    var disttelaviv = google.maps.geometry.spherical.computeDistanceBetween(myloc, telaviv);
-    var distbeersheva = google.maps.geometry.spherical.computeDistanceBetween(myloc, beersheva);
-    var shortest = Math.min(disttelmond, disttelaviv, distbeersheva);
-    switch (shortest)
-    {
-        case disttelmond:
-            $('#BradAmount').text("shortest is telmond");
-            break;
-        case disttelaviv:
-            $('#BradAmount').text("shortest is telaviv");
-            break;
-        case distbeersheva:
-            $('#BradAmount').text("shortest is beer sheva");
-            break;
-    }
-}
-infowindow = new google.maps.InfoWindow({ content: '<strong>Title</strong><br>Netanya, Israel<br>' });
-google.maps.event.addListener(marker, 'click', function () { infowindow.open(map, marker); }); infowindow.open(map, marker);
-} google.maps.event.addDomListener(window, 'load', init_map);</script>
+
+                function init_map() {
+                    geocoder = new google.maps.Geocoder();
+                   
+                    var myTrip = new Array();
+                    var defaultLatLng = new google.maps.LatLng(34.0983425, -118.3267434);  // Default to Hollywood, CA when no geolocation support
+                    if (navigator.geolocation) {
+                        function success(pos) {
+                            // Location found, show map with these coordinates
+                            var myloc = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+                            drawMap(myloc);
+                            calcdist(myloc);
+                        }
+                        function fail(error) {
+                            drawMap(defaultLatLng);  // Failed to find location, show default map
+                            $('#BradAmount').text("Couldn't get location");
+                        }
+                        // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
+                        navigator.geolocation.getCurrentPosition(success, fail, { maximumAge: 500000, enableHighAccuracy: true, timeout: 6000 });
+                    } else {
+                        drawMap(defaultLatLng);  // No geolocation support, show default map
+                    }
+                    function drawMap(latlng) {
+
+                        alert(JSON.stringify(latlng));
+                        var myOptions = {
+                            zoom: 10,
+                            center: latlng,
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                        };
+                        var map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
+                        // Add an overlay to the map of current lat/lng
+                        
+                    }
+
+                    function codeAddress(callback) {
+                        var address = getadress();
+                        var arr = [];
+                        for (var i = 0; i < address.length;i++)
+                        geocoder.geocode({ 'address': address[i] }, function (results, status) {
+                            if (status == google.maps.GeocoderStatus.OK) {
+                                lat = results[0].geometry.location.lat();
+                                lng = results[0].geometry.location.lng();
+                                arr.push({lat:lat,lng:lng})
+                                callback(arr);
+                            } else {
+                                alert("Geocode was not successful for the following reason: " + status);
+                            }
+                        });
+
+                        
+                    }
+
+
+                    function calcdist(myloc) {
+
+
+                        codeAddress(function(arr){
+                            adress=getadress();
+                            if (arr.length == adress.length) {
+                                var distances = [];
+                                for (var i = 0; i < arr.length; i++) {
+                                    distances.push(google.maps.geometry.spherical.computeDistanceBetween(myloc, new google.maps.LatLng(arr[i].lat, arr[i].lng)));
+                                }
+                                debugger;
+                                var x = getmin(distances);
+
+                                minimumindex = distances.indexOf(x);
+                                if (minimumindex >= 0) {
+                                  
+                                    var myOptions = {
+                                        zoom: 10,
+                                        center: arr[minimumindex],
+                                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                                    };
+                                    var map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
+                                    var marker = new google.maps.Marker({
+                                        position: arr[minimumindex],
+                                        map: map,
+                                        title: "Greetings!"
+                                    });
+                                    infowindow = new google.maps.InfoWindow({ content: '</br><strong>location</strong></br>' + adress[minimumindex] + '<br>' });
+                                    google.maps.event.addListener(marker, 'click', function () { infowindow.open(map, marker); });
+                                    infowindow.open(map, marker);
+                                }
+                            }
+                        });
+
+
+
+                        
+                      
+                       
+                    }
+
+                    
+                   
+                }
+                google.maps.event.addDomListener(window, 'load', init_map());
+            </script>
 
         </div>
-        <div data-role="content">
-            <p style="text-align:center">
-                <span>Closest store: </span><span id="BradAmount">0</span><br />
-            </p>
+        
             <div data-role="footer" data-position="fixed" data-theme="d">
                 <h5>Gluten Free Shop &nbsp &copy; &nbsp Nir Chen</h5>
             </div>
         </div>
 
-    <!--the order page-->
-    <div data-role="page" id="OrderPage" data-theme="a">
-        <div data-role="header">
-            <div data-role="navbar">
-                <ul>
-                    <li><a href="#AboutPage" >About</a></li>
-                    <li><a href="#OrderPage" class="ui-state-persist">Order</a></li>
-                    <li><a href="#UserPage">User</a></li>
-                    <li><a href="#MapPage">Map page</a></li>
-                </ul>
-            </div>
-        </div>
-        <div data-role="content">
-            <div class="ui-grid-c" style="border:1px solid black;text-align:center">
-                <div class="ui-block-a"><div style="border:1px solid black"></div></div>
-                <div class="ui-block-b"><div class="t1">Product</div></div>
-                <div class="ui-block-c"><div class="t1">Cost</div></div>
-                <div class="ui-block-d"><div class="t1">Add</div></div>
 
-                <div class="ui-block-a"><div style="border:1px solid black"><img src="pics/brad.jpg" style="height:48px;width:50px;margin-top:1px;" /></div></div>
-                <div class="ui-block-b"><div class="t1">BRAD</div></div>
-                <div class="ui-block-c"><div class="t1">20</div></div>
-                <div class="ui-block-d" >
-                    <div class="t1" >
-                        <a href="#" id="AddBrad" data-role="button" data-mini="true" data-inline="true" data-icon="plus" data-iconpos="notext" 
-                                                                        style="margin:0px;padding:0px;margin-bottom:20px;">add</a>
-                        <a href="#" id="RemoveBrad" data-role="button" data-mini="true" data-inline="true" data-icon="minus" data-iconpos="notext" 
-                                                                        style="margin:0px;padding:0px;margin-bottom:20px;">Remove</a>
-                    </div>
-                </div>
-
-                <div class="ui-block-a"><div style="border:1px solid black"><img src="pics/lachmania.jpg" style="height:48px;width:50px;margin-top:1px;" /></div></div>
-                <div class="ui-block-b"><div class="t1">BUN</div></div>
-                <div class="ui-block-c"><div class="t1">10</div></div>
-                <div class="ui-block-d">
-                    <div class="t1">
-                        <a href="#" id="AddBun" data-role="button" data-mini="true" data-inline="true" data-icon="plus" data-iconpos="notext" 
-                                                                        style="margin:0px;padding:0px;margin-bottom:20px;">add</a>
-                        <a href="#" id="RemoveBun" data-role="button" data-mini="true" data-inline="true" data-icon="minus" data-iconpos="notext" 
-                                                                        style="margin:0px;padding:0px;margin-bottom:20px;">Remove</a>
-                    </div>
-                </div>
-
-                <div class="ui-block-a"><div style="border:1px solid black"><img src="pics/pasta.jpg" style="height:48px;width:50px;margin-top:1px;" /></div></div>
-                <div class="ui-block-b"><div class="t1">PASTA</div></div>
-                <div class="ui-block-c"><div class="t1">30</div></div>
-                <div class="ui-block-d">
-                    <div class="t1">
-                        <a href="#" id="AddPasta" data-role="button" data-mini="true" data-inline="true" data-icon="plus" data-iconpos="notext" 
-                                                                        style="margin:0px;padding:0px;margin-bottom:20px;">add</a>
-                        <a href="#" id="RemovePasta" data-role="button" data-mini="true" data-inline="true" data-icon="minus" data-iconpos="notext" 
-                                                                        style="margin:0px;padding:0px;margin-bottom:20px;">Remove</a>
-                    </div>
-                </div>
-            </div>
-            <div style="text-align:center">
-            <span>BRAD Amount: </span><span id="BradAmount">0</span><br />
-            <span>BUN Amount: </span><span id="BunAmount">0</span><br />
-            <span>PASTA Amount: </span><span id="PastaAmount">0</span><br />
-            </div>
-            <div style="text-align:center;font-style:italic">
-            <span>_____________</span><br />
-            <span>Total Price: </span><span id="TotalPrice">0</span><br />
-            <button id="payBtn"  data-inline="true">PAY</button>
-            </div>
-
-        </div>
-        <div data-role="footer" data-position="fixed" data-theme="d">
-            <h5>Gluten Free Shop &nbsp &copy; &nbsp Nir Chen</h5>
-        </div>
-    </div>
-
-    <!--the User page-->
-    <div data-role="page" id="UserPage" data-theme="a">
-        <div data-role="header">
-            <div data-role="navbar">
-                <ul>
-                    <li><a href="#AboutPage" >About</a></li>
-                    <li><a href="#OrderPage" >Order</a></li>
-                    <li><a href="#UserPage" class="ui-state-persist">User</a></li>
-                    <li><a href="#MapPage">Map page</a></li>
-                </ul>
-            </div>
-        </div>
-        <div data-role="content">
-            <div class="ui-grid-a" style="border:1px solid black;margin-top:100px;">
-                <div class="ui-block-a" ><div class="b1" id="Div1">Name</div></div>
-                <div class="ui-block-b" ><div class="b1" id="Div2">Pass</div></div>
-                <div class="ui-block-a" ><div class="b1" id="UserName"></div></div>
-                <div class="ui-block-b" ><div class="b1" id="UserPass"></div></div>
-            </div>
-            
-        </div>
-        <div data-role="footer" data-position="fixed" data-theme="d">
-            <h5>Gluten Free Shop &nbsp &copy; &nbsp Nir Chen</h5>
-        </div>
-    </div>
 </body>
 </html>

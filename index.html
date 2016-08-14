@@ -42,7 +42,7 @@
 
                             $("#ShopPage").append("<div data-role='panel' id='myPanels" + i + "'>    <h2>" + data.d[i].Name + "</h2>" +
                                 " <p>contact us</p><p>Phone:" + data.d[i].Phone + "</p><p>Adress" + data.d[i].Adress + "</p>" +
-                            "<a name='" + data.d[i].Name + "' onclick='myshop(this.name)' href='#OrderPage' data-rel='close' class='ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-a ui-icon-eye ui-btn-icon-left'>enter store</a> </div>");
+                            "<a name='" + data.d[i].Name + "' onclick='myshop(this.name)' href='#OrderPage' data-rel='close' class='ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-a ui-icon-arrow-r ui-btn-icon-left'>enter store</a> </div>");
 
                             $("#shop").append("<a  href='#myPanels" + i + "' class='ui-btn  ui-shadow'>" + data.d[i].Name + "</a>");
                             if (typeof (Storage) !== "undefined") {
@@ -219,7 +219,7 @@
         function wireEventsItemsPage() {
 
             WebServiceURL = "Products.asmx";
-            alert(sessionStorage.name);
+            
             $.support.cors = true;
             $.ajax({
                 url: WebServiceURL + "/GetProducts",
@@ -237,22 +237,22 @@
 
                     for (var i = 0; i < data.d.length; i++) {
                         var img = "<img src='" + data.d[i].imgUrl + "'>";
-                        var itemtoadd = liItem + "class='shopitems'"+" id='" + data.d[i].imgUrl + "' >" + img + "<h2>" + data.d[i].Title + "</h2></a></li>";
+                        var itemtoadd = liItem + "class='shopitems'" + " id='" + data.d[i].imgUrl + "' >" + img + "<h2>" + data.d[i].Title + "</h2></a></li>";
                         $('#itemlist').append(itemtoadd).listview('refresh');
 
                     }
                     $(".shopitems").bind('click', function () {
-                        
+
                         var target = $(this),
                           brand = target.find("h2").html(),
-                          
-                          short = target.attr("id").slice(6, target.attr("id").length-4),
+
+                          short = target.attr("id").slice(6, target.attr("id").length - 4),
                           closebtn = '<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>',
-                          header = '<div data-role="header"><h7>' + brand +'</h7></div>',
-                          img = '<img src=/pics/' +short + '.jpg alt="' + brand + '" class="photo">',
-                          popup = '<div data-role="popup" id="popup-' + short + '" data-short="' + short + '" data-theme="none" data-overlay-theme="a" data-corners="false" data-tolerance="15"></div>';
+                          header = '<div data-role="header"><h7>' + brand + '</h7></div>',
+                          img = '<img src=/pics/' + short + '.jpg alt="' + brand + '" class="photo">',
+                          popup = '<div data-role="popup" id="popup-' + short + '" data-short="' + short + '" data-theme="none" data-overlay-theme="a" data-corners="false" data-tolerance="15"><a name="' + short + '" onclick=saveItem(this.name) href="#OrderItemPage" class="ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-a ui-icon-arrow-r ">make a order</a></div>';
                         // Create the popup.
-                       
+
                         $(header)
                             .appendTo($(popup)
                                 .appendTo($.mobile.activePage)
@@ -294,6 +294,105 @@
 
         }
 
+        function saveItem(itemname) {
+            if (typeof (Storage) !== "undefined")
+                sessionStorage['item'] = itemname;
+        }
+
+        $(document).on("pageinit", "#OrderItemPage", function () {
+            wireEventsOrderItemPage();
+
+        });
+        function wireEventsOrderItemPage() {
+            $('#placeorder').on('click', function () {
+                WebServiceURL = "OrderItemWS.asmx";
+
+                $.support.cors = true;
+                $.ajax({
+                    url: WebServiceURL + "/addOrder",
+                    dataType: "json",
+
+                    type: "POST",
+                    data: "{'Email':'" + $("#email").val() + "'," +
+                                "'Phone':'" + $("#uphone").val() + "'," +
+                                "'ProductName':'" + sessionStorage['item'] + "'," +
+                               "'shopid':'" + sessionStorage[sessionStorage.name] +
+                                "'}",
+                    contentType: "application/json; charset=utf-8",
+                    error: function (err) {
+                        alert("errornir: " + JSON.stringify(err));
+                    },
+                    success: function (data) {
+
+
+
+                        
+                        if (data.d) {
+                            msg('<h2>your orderd was registerd successfully !<h2></br><p>see  you in our store ;) !</p>', 'info', function () {
+                                alert('call back function');// this line is not called
+                            });
+                          
+                        } else {
+                            msg('failed', 'info', function () {
+                                alert('call back function');// this line is not called
+                            });
+                        }
+                    }
+                });
+            });
+                function msg(_msg, _title, _okCB) {
+                    try {
+                        if (_title == null || _title == undefined || _title == '') {
+                            _title = 'Information';
+                        }
+                        if (_msg == null || _msg == undefined || _msg == '') {
+                            _msg = 'Error found. Please contact your administrator.';
+                        }
+                        // Create it in memory
+                        var dlg = $("<div id=\"dlgAlert\" class=\"ui-corner-all ui-shadow\" data-close-btn=\"right\" />")
+                            .attr("data-role", "dialog")
+                            .attr("id", "dialog");
+
+                        var header = $("<div />")
+                            .attr("data-role", "header")
+                            .attr("role", "banner")
+                            .html("<h2>" + _title + "</h2>");
+
+                        var content = $("<div style=\"padding: 15px;\" />")
+                            .attr("data-role", "content")
+                            .append($("<p />").html(_msg));
+
+                        content.append("<div ><a class='dlgalert' href='#index' data-rel='back'  data-role=\"button\"    data-theme=\"b\" >Close</a></div>");
+
+                        dlg.append(header).trigger('create');
+                        dlg.append(content).trigger('create');
+
+
+
+                        dlg.dialog({
+                            close: function (event, ui) {
+                                _okCB();  //this line is not called
+                            }
+                        }).appendTo($.mobile.pageContainer);
+
+                        $.mobile.changePage(dlg, {
+                            transition: "pop",
+                            role: "dialog",
+                            reverse: false
+
+                        });
+    
+                       
+        
+                    } catch (e) {
+                        alert(e);
+                    }
+
+
+
+
+            }
+        }
 
 
 
@@ -318,6 +417,11 @@
 
 
                     }
+
+
+
+
+
                 }
             });
 
@@ -424,7 +528,7 @@
                 <input type="number" name="phone" id="phone" placeholder="Your phone..">
             </div>
             <input type="button" data-inline="true" id="orderbtn" value="make your appoitnment">
-            <a href="#ItemsPage" data-inline="true" class='ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-a ui-icon-eye ui-btn-icon-left'>our products</a>
+            <a href="#ItemsPage" data-inline="true" class='ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-a ui-icon-info ui-btn-icon-left'>our products</a>
         </div>
 
 
@@ -470,7 +574,44 @@
 
 
 
+    <!--the OrderItemPage -->
+    <div data-role="page" id="OrderItemPage" data-theme="b">
 
+
+
+        <div data-role="header">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
+
+                    <li><a href="#MapPage">Map page</a></li>
+
+                </ul>
+            </div>
+        </div>
+        <div data-role="content">
+
+
+
+            <div class="ui-field-contain">
+                <label for="email">email:</label>
+                <input type="email" name="email" id="email" placeholder="name@gmail..">
+
+                <label for="uphone">phone:</label>
+                <input type="number" name="uphone" id="uphone">
+            </div>
+           
+            
+            <a href="#" id="placeorder" class="ui-btn">order</a>
+        </div>
+
+
+
+        <div data-role="footer" data-position="fixed" data-theme="d">
+            <h5>pets  Shops &nbsp &copy; &nbsp  group11</h5>
+        </div>
+    </div>
+    
 
 
 

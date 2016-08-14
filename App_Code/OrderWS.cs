@@ -4,11 +4,12 @@ using System.Linq;
 using System.Web;
 using System.Web.Services;
 using System.Data.SqlClient;
+using System.Web.Configuration;
 
 /// <summary>
 /// Summary description for OrderWS
 /// </summary>
-[WebService(Namespace = "http://tempuri.org/")]
+[WebService(Namespace = "http://petshop.org/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
  [System.Web.Script.Services.ScriptService]
@@ -22,14 +23,32 @@ public class OrderWS : System.Web.Services.WebService {
 
 
     [WebMethod]
-    public int InsertOrder(string UserName, int Price)
+    public int InsertOrder(string UserName,string Phone,string date,string time)
     {
-        string conStr = @"Data Source=E440;Initial Catalog=Mobile2013A;Integrated Security=True";
+        string conStr = WebConfigurationManager.ConnectionStrings["conString"].ConnectionString;
+
         SqlConnection con = new SqlConnection(conStr);
-        SqlCommand com = new SqlCommand("INSERT INTO Orders VALUES('"+ DateTime.Now.ToShortDateString() +"','"+UserName+"',"+Price+")", con);
-        com.Connection.Open();
+        con.Open();
+        // modify the format depending upon input required in the column in database 
+        SqlCommand checkcom = new SqlCommand("SELECT * FROM appointments ", con);
+        SqlDataReader reader = checkcom.ExecuteReader();
+
+
+       
+        while (reader.Read())
+        {
+
+           var x=reader["date"].ToString();
+            var str = x.Substring(0, 16);
+            if (str.Equals(date + " " + time))
+            return -1;
+        }
+        con.Close();
+        con.Open();
+        SqlCommand com = new SqlCommand("INSERT INTO Appointments VALUES('" + UserName + "','" + date+" "+time +"','"+Phone+ "')", con);
+      
         int rows = com.ExecuteNonQuery();
-        com.Connection.Close();            
+        con.Close();            
         return rows;
     }    
 }

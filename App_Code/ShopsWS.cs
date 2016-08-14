@@ -51,5 +51,40 @@ public class ShopsWS : System.Web.Services.WebService
         return adrress;
 
     }
-    
+
+    [WebMethod]
+    public List<Shop> GetShops()
+    {
+        List<Shop> items = new List<Shop>();
+        string conStr = WebConfigurationManager.ConnectionStrings["conString"].ConnectionString;
+        SqlConnection con = new SqlConnection(conStr);
+        con.Open();
+        SqlCommand com = new SqlCommand("SELECT * FROM Shops ", con);
+
+       
+
+         
+        SqlDataReader reader = com.ExecuteReader();
+
+
+       
+        while (reader.Read())
+        {
+
+            items.Add(new Shop {
+                Name = reader["ShopName"].ToString(),
+                Phone = reader["PhoneNumber"].ToString(),
+                Adress = reader["Adress"].ToString(),
+                Id =  reader["id"].ToString()
+
+            });
+           
+        }
+        con.Close();
+
+        return items;
+    }
+
+
+
 }

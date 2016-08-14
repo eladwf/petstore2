@@ -6,6 +6,7 @@
     <link href="styles/MyStSh.css" rel="stylesheet" type="text/css" />
     <link href="styles/jquery.mobile-1.4.5.min.css" rel="stylesheet" />
     <script src="scripts/jquery-1.12.4.min.js"></script>
+    <script src='https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDMvuJFvCghEamrQNgQ68q3f6mYFNRpA1Q&libraries=geometry'></script>
     <script type="text/javascript">
         $(document).on('mobileinit', function () {
             $.mobile.defaultPageTransition = "slide";
@@ -13,12 +14,295 @@
     </script>
     <script src="scripts/jquery.mobile-1.4.5.min.js"></script>
     <script type="text/javascript">
-        function getadress() {
-            var address = [];
+
+        $(document).on("pageinit", "#ShopPage", function (event) {
+            wireEventsShopPage();
+        });
+
+        function wireEventsShopPage() {
+            WebServiceURL = "ShopsWS.asmx";
+            $.ajax({
+                url: WebServiceURL + "/GetShops",
+                dataType: "json",
+
+                type: "POST",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                error: function (err) {
+                    alert("errornir: " + JSON.stringify(err));
+                },
+                success: function (data) {
+                    if (data.d != undefined) {
+
+
+
+                        for (var i = 0; i < data.d.length; i++) {
+
+
+
+                            $("#ShopPage").append("<div data-role='panel' id='myPanels" + i + "'>    <h2>" + data.d[i].Name + "</h2>" +
+                                " <p>contact us</p><p>Phone:" + data.d[i].Phone + "</p><p>Adress" + data.d[i].Adress + "</p>" +
+                            "<a name='" + data.d[i].Name + "' onclick='myshop(this.name)' href='#OrderPage' data-rel='close' class='ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-a ui-icon-eye ui-btn-icon-left'>enter store</a> </div>");
+
+                            $("#shop").append("<a  href='#myPanels" + i + "' class='ui-btn  ui-shadow'>" + data.d[i].Name + "</a>");
+                            if (typeof (Storage) !== "undefined") {
+                                sessionStorage[data.d[i].Name] = data.d[i].Id;
+                            }
+
+                        }
+                        $("[data-role=panel]").panel().enhanceWithin();
+
+
+
+
+
+
+
+
+
+                    }
+                }
+            });
+
+
+        }
+
+        function myshop(name) {
+            if (typeof (Storage) !== "undefined") {
+                sessionStorage.name = name;
+            }
+        }
+
+
+        $(document).on("pageinit", "#MapPage", function () {
+            geocoder = new google.maps.Geocoder();
+
+            var myTrip = new Array();
+            var defaultLatLng = new google.maps.LatLng(34.0983425, -118.3267434);  // Default to Hollywood, CA when no geolocation support
+            if (navigator.geolocation) {
+                function success(pos) {
+                    // Location found, show map with these coordinates
+                    var myloc = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+                    drawMap(myloc);
+                    calcdist(myloc);
+                }
+                function fail(error) {
+                    drawMap(defaultLatLng);  // Failed to find location, show default map
+                    $('#distance').text("Couldn't get location");
+                }
+                // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
+                navigator.geolocation.getCurrentPosition(success, fail, { maximumAge: 500000, enableHighAccuracy: true, timeout: 6000 });
+            } else {
+                drawMap(defaultLatLng);  // No geolocation support, show default map
+            }
+            function drawMap(latlng) {
+
+
+                var myOptions = {
+                    zoom: 10,
+                    center: latlng,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                };
+                var map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
+                // Add an overlay to the map of current lat/lng
+
+            }
+
+            function codeAddress(callback) {
+                var shops = getshops();
+
+
+                var arr = [];
+                for (var i = 0; i < shops.length; i++)
+                    geocoder.geocode({ 'address': shops[i].Adress }, function (results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                            lat = results[0].geometry.location.lat();
+                            lng = results[0].geometry.location.lng();
+                            arr.push({ lat: lat, lng: lng })
+                            callback(arr);
+                        } else {
+                            alert("Geocode was not successful for the following reason: " + status);
+                        }
+                    });
+
+
+            }
+
+
+            function calcdist(myloc) {
+
+
+                codeAddress(function (arr) {
+                    var shops = getshops();
+                    if (arr.length == shops.length) {
+                        var distances = [];
+                        for (var i = 0; i < arr.length; i++) {
+                            distances.push(google.maps.geometry.spherical.computeDistanceBetween(myloc, new google.maps.LatLng(arr[i].lat, arr[i].lng)));
+                        }
+                        debugger;
+                        var x = getmin(distances);
+
+                        minimumindex = distances.indexOf(x);
+                        if (minimumindex >= 0) {
+
+                            var myOptions = {
+                                zoom: 10,
+                                center: arr[minimumindex],
+                                mapTypeId: google.maps.MapTypeId.ROADMAP
+                            };
+                            var map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
+                            var marker = new google.maps.Marker({
+                                position: arr[minimumindex],
+                                map: map,
+                                title: "Greetings!"
+                            });
+                            infowindow = new google.maps.InfoWindow({ content: '</br><strong>location</strong></br>' + shops[minimumindex].Name + '</br>' + shops[minimumindex].Adress + '</br>' });
+                            google.maps.event.addListener(marker, 'click', function () { infowindow.open(map, marker); });
+                            infowindow.open(map, marker);
+                        }
+                    }
+                });
+
+
+
+
+
+
+            }
+
+
+        });
+
+
+
+        $(document).on("pageinit", "#OrderPage", function (event) {
+            wireEventsOrderPage();
+        });
+        function wireEventsOrderPage() {
+            $('#orderbtn').on('click', function () {
+                WebServiceURL = "OrderWS.asmx";
+                $.support.cors = true;
+                $.ajax({
+                    url: WebServiceURL + "/InsertOrder",
+                    dataType: "json",
+                    type: "POST",
+                    data: "{'UserName':'" + $("#user").val() + "'," +
+                            "'Phone':'" + $("#phone").val() + "'," +
+                            "'date':'" + $("#date").val() + "'," +
+                            "'time':'" + $("#time").val() + "'}",
+                    contentType: "application/json; charset=utf-8",
+                    error: function (err) {
+                        alert("errornir: " + JSON.stringify(err));
+                    },
+                    success: function (data) {
+                        if (data["d"] == 1) {
+                            alert("you register succesfuly");
+                        }
+                        else {
+                            alert("please try another date or hour");
+                        }
+                    }
+                });
+            });
+
+
+
+        }
+
+        //____________items___________________
+        $(document).on("pageinit", "#ItemsPage", function () {
+            wireEventsItemsPage();
+
+        });
+
+
+        function wireEventsItemsPage() {
+
+            WebServiceURL = "Products.asmx";
+            alert(sessionStorage.name);
+            $.support.cors = true;
+            $.ajax({
+                url: WebServiceURL + "/GetProducts",
+                dataType: "json",
+
+                type: "POST",
+                data: "{'id':'" + sessionStorage[sessionStorage.name] + "'}",
+                contentType: "application/json; charset=utf-8",
+                error: function (err) {
+                    alert("errornir: " + JSON.stringify(err));
+                },
+                success: function (data) {
+
+                    var liItem = " <li ><a href='#' ";
+
+                    for (var i = 0; i < data.d.length; i++) {
+                        var img = "<img src='" + data.d[i].imgUrl + "'>";
+                        var itemtoadd = liItem + "class='shopitems'"+" id='" + data.d[i].imgUrl + "' >" + img + "<h2>" + data.d[i].Title + "</h2></a></li>";
+                        $('#itemlist').append(itemtoadd).listview('refresh');
+
+                    }
+                    $(".shopitems").bind('click', function () {
+                        
+                        var target = $(this),
+                          brand = target.find("h2").html(),
+                          
+                          short = target.attr("id").slice(6, target.attr("id").length-4),
+                          closebtn = '<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>',
+                          header = '<div data-role="header"><h7>' + brand +'</h7></div>',
+                          img = '<img src=/pics/' +short + '.jpg alt="' + brand + '" class="photo">',
+                          popup = '<div data-role="popup" id="popup-' + short + '" data-short="' + short + '" data-theme="none" data-overlay-theme="a" data-corners="false" data-tolerance="15"></div>';
+                        // Create the popup.
+                       
+                        $(header)
+                            .appendTo($(popup)
+                                .appendTo($.mobile.activePage)
+                                .popup())
+                            .toolbar()
+                            .before(closebtn)
+                            .after(img);
+                        // Wait with opening the popup until the popup image has been loaded in the DOM.
+                        // This ensures the popup gets the correct size and position
+                        $(".photo", "#popup-" + short).load(function () {
+                            // Open the popup
+                            $("#popup-" + short).popup("open");
+                            // Clear the fallback
+                            clearTimeout(fallback);
+                        });
+                        // Fallback in case the browser doesn't fire a load event
+                        var fallback = setTimeout(function () {
+                            $("#popup-" + short).popup("open");
+                        }, 2000);
+                    });
+                    // Set a max-height to make large images shrink to fit the screen.
+                    $(document).on("popupbeforeposition", ".ui-popup", function () {
+                        var image = $(this).children("img"),
+                            height = image.height(),
+                            width = image.width();
+                        // Set height and width attribute of the image
+                        $(this).attr({ "height": height, "width": width });
+                        // 68px: 2 * 15px for top/bottom tolerance, 38px for the header.
+                        var maxHeight = $(window).height() - 68 + "px";
+                        $("img.photo", this).css("max-height", maxHeight);
+                    });
+                    // Remove the popup after it has been closed to manage DOM size
+                    $(document).on("popupafterclose", ".ui-popup", function () {
+                        $(this).remove();
+
+                    });
+                }
+            });
+
+        }
+
+
+
+
+        function getshops() {
+            var shops = [];
             WebServiceURL = "ShopsWS.asmx";
             $.support.cors = true;
             $.ajax({
-                url: WebServiceURL + "/GetShopsAdress",
+                url: WebServiceURL + "/GetShops",
                 dataType: "json",
                 async: false,
                 type: "POST",
@@ -30,19 +314,19 @@
                 success: function (data) {
                     if (data["d"] != undefined) {
                         for (var i = 0; i < data["d"].length; i++)
-                            address.push(data["d"][i])
+                            shops.push(data["d"][i])
 
 
                     }
                 }
             });
 
-            return address;
+            return shops;
         }
         var getmin = function (values) {
-            if(values.length==0)
+            if (values.length == 0)
                 return -1;
-            var min=values[0];
+            var min = values[0];
             for (var i = 1; i < values.length; i++)
                 if (min < values[i])
                     min = values[i];
@@ -54,28 +338,28 @@
 </head>
 <body>
 
-    <!--the About page-->
-    <div data-role="page" id="AboutPage" data-theme="a">
+    <!--the Shop page-->
+    <div data-role="page" id="ShopPage" data-theme="b">
+
+
+
         <div data-role="header">
             <div data-role="navbar">
                 <ul>
-                    <li><a href="#AboutPage" class="ui-state-persist">About</a></li>
-                    <li><a href="#OrderPage">Order</a></li>
-                    <li><a href="#UserPage">User</a></li>
+                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
+
                     <li><a href="#MapPage">Map page</a></li>
 
                 </ul>
             </div>
         </div>
         <div data-role="content">
-            <p style="text-align:center">
-                This is a Gluten Free Shop.<br />
-                You can make an order and enjoy (or not)<br />
-                our Products:)
-            </p>
+            <div id="shop" data-role="controlgroup">
+
+            </div>
         </div>
-        <div data-role="footer" data-position="fixed" data-theme="d">
-            <h5>Gluten Free Shop &nbsp &copy; &nbsp Nir Chen</h5>
+        <div data-role="footer" data-position="fixed" data-theme="b">
+            <h5>pets Shops  &nbsp &copy; &nbsp  group11</h5>
         </div>
     </div>
 
@@ -84,17 +368,16 @@
         <div data-role="header">
             <div data-role="navbar">
                 <ul>
-                    <li><a href="#AboutPage" class="ui-state-persist">About</a></li>
-                    <li><a href="#OrderPage">Order</a></li>
-                    <li><a href="#UserPage">User</a></li>
+                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
+
                     <li><a href="#MapPage">Map page</a></li>
 
                 </ul>
             </div>
         </div>
         <div data-role="content">
-            <script src='https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDMvuJFvCghEamrQNgQ68q3f6mYFNRpA1Q&libraries=geometry'></script><div style='overflow:hidden;height:440px;width:700px;'>
-                <div id='gmap_canvas' style='height:440px;width:700px;'></div><div><small><a href="http://embedgooglemaps.com">									embed google maps							</a></small></div>
+            <div style='overflow:hidden;height:440px;width:700px;'>
+                <div id='gmap_canvas' style='height:440px;width:700px;'></div><div><small><a href="http://embedgooglemaps.com">	embed google maps</a></small></div>
                 <style>
                     #gmap_canvas img {
                         max-width: none !important;
@@ -102,114 +385,93 @@
                     }
                 </style>
             </div>
-            <script type='text/javascript'>
 
-                function init_map() {
-                    geocoder = new google.maps.Geocoder();
-                   
-                    var myTrip = new Array();
-                    var defaultLatLng = new google.maps.LatLng(34.0983425, -118.3267434);  // Default to Hollywood, CA when no geolocation support
-                    if (navigator.geolocation) {
-                        function success(pos) {
-                            // Location found, show map with these coordinates
-                            var myloc = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-                            drawMap(myloc);
-                            calcdist(myloc);
-                        }
-                        function fail(error) {
-                            drawMap(defaultLatLng);  // Failed to find location, show default map
-                            $('#BradAmount').text("Couldn't get location");
-                        }
-                        // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
-                        navigator.geolocation.getCurrentPosition(success, fail, { maximumAge: 500000, enableHighAccuracy: true, timeout: 6000 });
-                    } else {
-                        drawMap(defaultLatLng);  // No geolocation support, show default map
-                    }
-                    function drawMap(latlng) {
-
-                        alert(JSON.stringify(latlng));
-                        var myOptions = {
-                            zoom: 10,
-                            center: latlng,
-                            mapTypeId: google.maps.MapTypeId.ROADMAP
-                        };
-                        var map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
-                        // Add an overlay to the map of current lat/lng
-                        
-                    }
-
-                    function codeAddress(callback) {
-                        var address = getadress();
-                        var arr = [];
-                        for (var i = 0; i < address.length;i++)
-                        geocoder.geocode({ 'address': address[i] }, function (results, status) {
-                            if (status == google.maps.GeocoderStatus.OK) {
-                                lat = results[0].geometry.location.lat();
-                                lng = results[0].geometry.location.lng();
-                                arr.push({lat:lat,lng:lng})
-                                callback(arr);
-                            } else {
-                                alert("Geocode was not successful for the following reason: " + status);
-                            }
-                        });
-
-                        
-                    }
-
-
-                    function calcdist(myloc) {
-
-
-                        codeAddress(function(arr){
-                            adress=getadress();
-                            if (arr.length == adress.length) {
-                                var distances = [];
-                                for (var i = 0; i < arr.length; i++) {
-                                    distances.push(google.maps.geometry.spherical.computeDistanceBetween(myloc, new google.maps.LatLng(arr[i].lat, arr[i].lng)));
-                                }
-                                debugger;
-                                var x = getmin(distances);
-
-                                minimumindex = distances.indexOf(x);
-                                if (minimumindex >= 0) {
-                                  
-                                    var myOptions = {
-                                        zoom: 10,
-                                        center: arr[minimumindex],
-                                        mapTypeId: google.maps.MapTypeId.ROADMAP
-                                    };
-                                    var map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
-                                    var marker = new google.maps.Marker({
-                                        position: arr[minimumindex],
-                                        map: map,
-                                        title: "Greetings!"
-                                    });
-                                    infowindow = new google.maps.InfoWindow({ content: '</br><strong>location</strong></br>' + adress[minimumindex] + '<br>' });
-                                    google.maps.event.addListener(marker, 'click', function () { infowindow.open(map, marker); });
-                                    infowindow.open(map, marker);
-                                }
-                            }
-                        });
-
-
-
-                        
-                      
-                       
-                    }
-
-                    
-                   
-                }
-                google.maps.event.addDomListener(window, 'load', init_map());
-            </script>
 
         </div>
-        
-            <div data-role="footer" data-position="fixed" data-theme="d">
-                <h5>Gluten Free Shop &nbsp &copy; &nbsp Nir Chen</h5>
+
+        <div data-role="footer" data-position="fixed" data-theme="b">
+            <h5>pets shops &nbsp &copy; &nbsp group11</h5>
+        </div>
+    </div>
+
+
+
+    <!--the order page-->
+    <div data-role="page" id="OrderPage" data-theme="b">
+
+
+
+        <div data-role="header">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
+
+                    <li><a href="#MapPage">Map page</a></li>
+
+                </ul>
             </div>
         </div>
+        <div data-role="content">
+            <h1>make appointment for hair cut for your pet</h1>
+            <div class="ui-field-contain">
+                <label for="fullname">Full name:</label>
+                <input type="text" name="fullname" id="fullname">
+                <label for="date">Date of Appointment:</label>
+                <input type="date" name="date" id="date">
+                <label for="tiem">and hour:</label>
+                <input type="time" name="time" id="time">
+                <label for="phone">phone:</label>
+                <input type="number" name="phone" id="phone" placeholder="Your phone..">
+            </div>
+            <input type="button" data-inline="true" id="orderbtn" value="make your appoitnment">
+            <a href="#ItemsPage" data-inline="true" class='ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-a ui-icon-eye ui-btn-icon-left'>our products</a>
+        </div>
+
+
+
+        <div data-role="footer" data-position="fixed" data-theme="d">
+            <h5>pets  Shops &nbsp &copy; &nbsp  group11</h5>
+        </div>
+    </div>
+
+
+
+    <!--the items page-->
+    <div data-role="page" id="ItemsPage" data-theme="b">
+
+
+
+        <div data-role="header">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
+
+                    <li><a href="#MapPage">Map page</a></li>
+
+                </ul>
+            </div>
+        </div>
+        <div data-role="content">
+
+
+            <ul id="itemlist" data-role="listview"></ul>
+
+
+
+        </div>
+
+
+
+        <div data-role="footer" data-position="fixed" data-theme="d">
+            <h5>pets  Shops &nbsp &copy; &nbsp  group11</h5>
+        </div>
+    </div>
+
+
+
+
+
+
 
 
 </body>

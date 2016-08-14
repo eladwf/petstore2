@@ -116,6 +116,7 @@
                 for (var i = 0; i < shops.length; i++)
                     geocoder.geocode({ 'address': shops[i].Adress }, function (results, status) {
                         if (status == google.maps.GeocoderStatus.OK) {
+                            debugger;
                             lat = results[0].geometry.location.lat();
                             lng = results[0].geometry.location.lng();
                             arr.push({ lat: lat, lng: lng })
@@ -133,48 +134,52 @@
 
 
                 codeAddress(function (arr) {
+
                     var shops = getshops();
                     if (arr.length == shops.length) {
                         var distances = [];
+                        var map = new google.maps.Map(document.getElementById("gmap_canvas"), {
+                            zoom: 10,
+                            center: myloc,
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                        });
+                        var marker;
+                        var infowindow = new google.maps.InfoWindow();
+                        var title='</br><strong>location</strong></br>' ;
+                        var add;
                         for (var i = 0; i < arr.length; i++) {
+                            add=title+shops[i].Name +'</br>' + shops[i].Adress + '</br>';
                             distances.push(google.maps.geometry.spherical.computeDistanceBetween(myloc, new google.maps.LatLng(arr[i].lat, arr[i].lng)));
+                            createMarker(add, arr[i].lat, arr[i].lng, infowindow,map,i);
                         }
-                        debugger;
+
                         var x = getmin(distances);
 
                         minimumindex = distances.indexOf(x);
-                        if (minimumindex >= 0) {
-
-                            var myOptions = {
-                                zoom: 10,
-                                center: arr[minimumindex],
-                                mapTypeId: google.maps.MapTypeId.ROADMAP
-                            };
-                            var map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
-                            var marker = new google.maps.Marker({
-                                position: arr[minimumindex],
-                                map: map,
-                                title: "Greetings!"
-                            });
-                            infowindow = new google.maps.InfoWindow({ content: '</br><strong>location</strong></br>' + shops[minimumindex].Name + '</br>' + shops[minimumindex].Adress + '</br>' });
-                            google.maps.event.addListener(marker, 'click', function () { infowindow.open(map, marker); });
-                            infowindow.open(map, marker);
-                        }
                     }
+
                 });
 
-
-
-
-
-
-            }
-
+        }
 
         });
 
+        function createMarker(add, lat, lng,infowindow,map,i) {
+
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng(lat, lng),
+                map: map,
+            });
+            google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                return function () {
+                    infowindow.setContent(add);
+                    infowindow.open(map, marker);
+                }
+            })(marker, i));
 
 
+
+        }
         $(document).on("pageinit", "#OrderPage", function (event) {
             wireEventsOrderPage();
         });
@@ -219,7 +224,7 @@
         function wireEventsItemsPage() {
 
             WebServiceURL = "Products.asmx";
-            
+
             $.support.cors = true;
             $.ajax({
                 url: WebServiceURL + "/GetProducts",
@@ -326,12 +331,12 @@
 
 
 
-                        
+
                         if (data.d) {
                             msg('<h2>your orderd was registerd successfully !<h2></br><p>see  you in our store ;) !</p>', 'info', function () {
                                 alert('call back function');// this line is not called
                             });
-                          
+
                         } else {
                             msg('failed', 'info', function () {
                                 alert('call back function');// this line is not called
@@ -340,53 +345,53 @@
                     }
                 });
             });
-                function msg(_msg, _title, _okCB) {
-                    try {
-                        if (_title == null || _title == undefined || _title == '') {
-                            _title = 'Information';
-                        }
-                        if (_msg == null || _msg == undefined || _msg == '') {
-                            _msg = 'Error found. Please contact your administrator.';
-                        }
-                        // Create it in memory
-                        var dlg = $("<div id=\"dlgAlert\" class=\"ui-corner-all ui-shadow\" data-close-btn=\"right\" />")
-                            .attr("data-role", "dialog")
-                            .attr("id", "dialog");
-
-                        var header = $("<div />")
-                            .attr("data-role", "header")
-                            .attr("role", "banner")
-                            .html("<h2>" + _title + "</h2>");
-
-                        var content = $("<div style=\"padding: 15px;\" />")
-                            .attr("data-role", "content")
-                            .append($("<p />").html(_msg));
-
-                        content.append("<div ><a class='dlgalert' href='#index' data-rel='back'  data-role=\"button\"    data-theme=\"b\" >Close</a></div>");
-
-                        dlg.append(header).trigger('create');
-                        dlg.append(content).trigger('create');
-
-
-
-                        dlg.dialog({
-                            close: function (event, ui) {
-                                _okCB();  //this line is not called
-                            }
-                        }).appendTo($.mobile.pageContainer);
-
-                        $.mobile.changePage(dlg, {
-                            transition: "pop",
-                            role: "dialog",
-                            reverse: false
-
-                        });
-    
-                       
-        
-                    } catch (e) {
-                        alert(e);
+            function msg(_msg, _title, _okCB) {
+                try {
+                    if (_title == null || _title == undefined || _title == '') {
+                        _title = 'Information';
                     }
+                    if (_msg == null || _msg == undefined || _msg == '') {
+                        _msg = 'Error found. Please contact your administrator.';
+                    }
+                    // Create it in memory
+                    var dlg = $("<div id=\"dlgAlert\" class=\"ui-corner-all ui-shadow\" data-close-btn=\"right\" />")
+                        .attr("data-role", "dialog")
+                        .attr("id", "dialog");
+
+                    var header = $("<div />")
+                        .attr("data-role", "header")
+                        .attr("role", "banner")
+                        .html("<h2>" + _title + "</h2>");
+
+                    var content = $("<div style=\"padding: 15px;\" />")
+                        .attr("data-role", "content")
+                        .append($("<p />").html(_msg));
+
+                    content.append("<div ><a class='dlgalert' href='#index' data-rel='back'  data-role=\"button\"    data-theme=\"b\" >Close</a></div>");
+
+                    dlg.append(header).trigger('create');
+                    dlg.append(content).trigger('create');
+
+
+
+                    dlg.dialog({
+                        close: function (event, ui) {
+                            _okCB();  //this line is not called
+                        }
+                    }).appendTo($.mobile.pageContainer);
+
+                    $.mobile.changePage(dlg, {
+                        transition: "pop",
+                        role: "dialog",
+                        reverse: false
+
+                    });
+
+
+
+                } catch (e) {
+                    alert(e);
+                }
 
 
 
@@ -432,7 +437,7 @@
                 return -1;
             var min = values[0];
             for (var i = 1; i < values.length; i++)
-                if (min < values[i])
+                if (min > values[i])
                     min = values[i];
             return min;
         }
@@ -600,8 +605,8 @@
                 <label for="uphone">phone:</label>
                 <input type="number" name="uphone" id="uphone">
             </div>
-           
-            
+
+
             <a href="#" id="placeorder" class="ui-btn">order</a>
         </div>
 
@@ -611,7 +616,7 @@
             <h5>pets  Shops &nbsp &copy; &nbsp  group11</h5>
         </div>
     </div>
-    
+
 
 
 

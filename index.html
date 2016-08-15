@@ -35,6 +35,10 @@
                     if (data.d != undefined) {
 
 
+                        $("#ShopPage").find("[data-role='content']").empty();
+                        $("#ShopPage").find("[data-role='content']").append('<div id="shop" data-role="controlgroup"></div>');
+                        
+          
 
                         for (var i = 0; i < data.d.length; i++) {
 
@@ -52,14 +56,6 @@
                         }
                         $("[data-role=panel]").panel().enhanceWithin();
 
-
-
-
-
-
-
-
-
                     }
                 }
             });
@@ -71,6 +67,7 @@
             if (typeof (Storage) !== "undefined") {
                 sessionStorage.name = name;
             }
+            location.reload();
         }
 
 
@@ -96,7 +93,7 @@
                 drawMap(defaultLatLng);  // No geolocation support, show default map
             }
             function drawMap(latlng) {
-
+              
 
                 var myOptions = {
                     zoom: 10,
@@ -132,7 +129,7 @@
 
             function calcdist(myloc) {
 
-
+                
                 codeAddress(function (arr) {
 
                     var shops = getshops();
@@ -148,7 +145,8 @@
                         var title='</br><strong>location</strong></br>' ;
                         var add;
                         for (var i = 0; i < arr.length; i++) {
-                            add=title+shops[i].Name +'</br>' + shops[i].Adress + '</br>';
+                            
+                            add = title + shops[i].Name + '</br>' + shops[i].Adress + '</br>';
                             distances.push(google.maps.geometry.spherical.computeDistanceBetween(myloc, new google.maps.LatLng(arr[i].lat, arr[i].lng)));
                             createMarker(add, arr[i].lat, arr[i].lng, infowindow,map,i);
                         }
@@ -224,7 +222,7 @@
         function wireEventsItemsPage() {
 
             WebServiceURL = "Products.asmx";
-
+           
             $.support.cors = true;
             $.ajax({
                 url: WebServiceURL + "/GetProducts",
@@ -239,7 +237,7 @@
                 success: function (data) {
 
                     var liItem = " <li ><a href='#' ";
-
+                   
                     for (var i = 0; i < data.d.length; i++) {
                         var img = "<img src='" + data.d[i].imgUrl + "'>";
                         var itemtoadd = liItem + "class='shopitems'" + " id='" + data.d[i].imgUrl + "' >" + img + "<h2>" + data.d[i].Title + "</h2></a></li>";
@@ -254,8 +252,11 @@
                           short = target.attr("id").slice(6, target.attr("id").length - 4),
                           closebtn = '<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>',
                           header = '<div data-role="header"><h7>' + brand + '</h7></div>',
+
                           img = '<img src=/pics/' + short + '.jpg alt="' + brand + '" class="photo">',
-                          popup = '<div data-role="popup" id="popup-' + short + '" data-short="' + short + '" data-theme="none" data-overlay-theme="a" data-corners="false" data-tolerance="15"><a name="' + short + '" onclick=saveItem(this.name) href="#OrderItemPage" class="ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-a ui-icon-arrow-r ">make a order</a></div>';
+                          popup = '<div data-role="popup" id="popup-' + short + '" data-short="' + short + '" data-theme="none" data-overlay-theme="a" data-corners="false" data-tolerance="15"></div>';
+                        link = '</br><a name="' + short + '" onclick=saveItem(this.name) href="#OrderItemPage" class="ui-btn    ui-icon-arrow-r ">make a order</a>'
+
                         // Create the popup.
 
                         $(header)
@@ -264,7 +265,7 @@
                                 .popup())
                             .toolbar()
                             .before(closebtn)
-                            .after(img);
+                            .after(img).append(link);
                         // Wait with opening the popup until the popup image has been loaded in the DOM.
                         // This ensures the popup gets the correct size and position
                         $(".photo", "#popup-" + short).load(function () {
@@ -447,6 +448,7 @@
 </head>
 <body>
 
+
     <!--the Shop page-->
     <div data-role="page" id="ShopPage" data-theme="b">
 
@@ -466,6 +468,30 @@
             <div id="shop" data-role="controlgroup">
 
             </div>
+        </div>
+        <div data-role="footer" data-position="fixed" data-theme="b">
+            <h5>pets Shops  &nbsp &copy; &nbsp  group11</h5>
+        </div>
+    </div>
+
+
+    <!--the Shop page-->
+    <div data-role="page" id="ShopPage" data-theme="b">
+
+
+
+        <div data-role="header">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
+
+                    <li><a href="#MapPage">Map page</a></li>
+
+                </ul>
+            </div>
+        </div>
+        <div data-role="content">
+           
         </div>
         <div data-role="footer" data-position="fixed" data-theme="b">
             <h5>pets Shops  &nbsp &copy; &nbsp  group11</h5>

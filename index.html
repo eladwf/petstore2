@@ -1,11 +1,23 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <style>
+        #gmap_canvas img {
+            max-width: none !important;
+            background: none !important;
+        }
+    </style>
+    <link href="themes/mytheme.css" rel="stylesheet" />
+    
+    <link rel="stylesheet" href="/themes/jquery.mobile.icons.min.css" />
+    <link href="themes/jquery.mobile.icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <title>pages</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <link href="styles/MyStSh.css" rel="stylesheet" type="text/css" />
-    <link href="styles/jquery.mobile-1.4.5.min.css" rel="stylesheet" />
-    <script src="scripts/jquery-1.12.4.min.js"></script>
+   
     <script src='https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDMvuJFvCghEamrQNgQ68q3f6mYFNRpA1Q&libraries=geometry'></script>
     <script type="text/javascript">
         $(document).on('mobileinit', function () {
@@ -154,8 +166,11 @@
                         var x = getmin(distances);
 
                         minimumindex = distances.indexOf(x);
-                    }
+                        $('#message').text(shops[minimumindex].Name);
+                        $('#address').text(shops[minimumindex].Adress);
 
+                    }
+                   
                 });
 
         }
@@ -239,7 +254,7 @@
                     var liItem = " <li ><a href='#' ";
                    
                     for (var i = 0; i < data.d.length; i++) {
-                        var img = "<img src='" + data.d[i].imgUrl + "'>";
+                        var img = "<img src='" + data.d[i].imgUrl + "'height='100' width='100'>";
                         var itemtoadd = liItem + "class='shopitems'" + " id='" + data.d[i].imgUrl + "' >" + img + "<h2>" + data.d[i].Title + "</h2></a></li>";
                         $('#itemlist').append(itemtoadd).listview('refresh');
 
@@ -253,8 +268,9 @@
                           closebtn = '<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>',
                           header = '<div data-role="header"><h7>' + brand + '</h7></div>',
 
-                          img = '<img src=/pics/' + short + '.jpg alt="' + brand + '" class="photo">',
-                          popup = '<div data-role="popup" id="popup-' + short + '" data-short="' + short + '" data-theme="none" data-overlay-theme="a" data-corners="false" data-tolerance="15"></div>';
+                         
+                        img = '<img src=/pics/' + short + '.jpg alt="' + brand + '" class="photo" >',
+                          popup = '<div data-role="popup" id="popup-' + short + '" data-short="' + short + '" data-theme="a" data-overlay-theme="a" data-corners="false" data-tolerance="15"></div>';
                         link = '</br><a name="' + short + '" onclick=saveItem(this.name) href="#OrderItemPage" class="ui-btn    ui-icon-arrow-r ">make a order</a>'
 
                         // Create the popup.
@@ -368,7 +384,7 @@
                         .attr("data-role", "content")
                         .append($("<p />").html(_msg));
 
-                    content.append("<div ><a class='dlgalert' href='#index' data-rel='back'  data-role=\"button\"    data-theme=\"b\" >Close</a></div>");
+                    content.append("<div ><a class='dlgalert' href='#index' data-rel='back'  data-role=\"button\"    data-theme=\"a\" >Close</a></div>");
 
                     dlg.append(header).trigger('create');
                     dlg.append(content).trigger('create');
@@ -394,13 +410,8 @@
                     alert(e);
                 }
 
-
-
-
             }
         }
-
-
 
         function getshops() {
             var shops = [];
@@ -424,10 +435,6 @@
 
                     }
 
-
-
-
-
                 }
             });
 
@@ -449,51 +456,55 @@
 <body>
 
 
-    <!--the Shop page-->
-    <div data-role="page" id="ShopPage" data-theme="b">
+    <!--the Welcome page-->
+    <div data-role="page" id="WelcomePage" data-theme="a">
 
 
 
         <div data-role="header">
             <div data-role="navbar">
                 <ul>
-                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
-
-                    <li><a href="#MapPage">Map page</a></li>
+                    <li><a href="#WelcomePage" class="ui-btn-active ui-state-persist " data-icon="home">home</a></li>
+                    <li><a href="#ShopPage" data-icon="bars" >shops</a></li>
+                    <li><a href="#MapPage" data-icon="location">Map page</a></li>
 
                 </ul>
             </div>
         </div>
-        <div data-role="content">
-            <div id="shop" data-role="controlgroup">
+        <div data-role="content" class="ui-content" style="text-align:center;">
+            
+                <h3>Welcome to pet shops mobile.</h3>
+                 <p>here you can search for the closet shop to your location,<br>look for intersting items and much more  </p>
 
-            </div>
+
+            
         </div>
-        <div data-role="footer" data-position="fixed" data-theme="b">
+        <div data-role="footer" data-position="fixed" data-theme="a">
             <h5>pets Shops  &nbsp &copy; &nbsp  group11</h5>
         </div>
     </div>
 
 
     <!--the Shop page-->
-    <div data-role="page" id="ShopPage" data-theme="b">
+    <div data-role="page" id="ShopPage" data-theme="a">
 
 
 
         <div data-role="header">
             <div data-role="navbar">
                 <ul>
-                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
+                    <li><a href="#WelcomePage" class="ui-btn-active ui-state-persist" data-icon="home">home</a></li>
+                    <li><a href="#ShopPage" data-icon="bars">shops</a></li>
 
-                    <li><a href="#MapPage">Map page</a></li>
+                    <li><a href="#MapPage" data-icon="location">Map page</a></li>
 
                 </ul>
             </div>
         </div>
         <div data-role="content">
-           
+            
         </div>
-        <div data-role="footer" data-position="fixed" data-theme="b">
+        <div data-role="footer" data-position="fixed" data-theme="a">
             <h5>pets Shops  &nbsp &copy; &nbsp  group11</h5>
         </div>
     </div>
@@ -503,28 +514,26 @@
         <div data-role="header">
             <div data-role="navbar">
                 <ul>
-                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
+                    <li><a href="#WelcomePage" class="ui-btn-active ui-state-persist" data-icon="home">home</a></li>
+                    <li><a href="#ShopPage" data-icon="bars" >shops</a></li>
 
-                    <li><a href="#MapPage">Map page</a></li>
+                    <li><a href="#MapPage" data-icon="location">Map page</a></li>
 
                 </ul>
             </div>
         </div>
         <div data-role="content">
-            <div style='overflow:hidden;height:440px;width:700px;'>
-                <div id='gmap_canvas' style='height:440px;width:700px;'></div><div><small><a href="http://embedgooglemaps.com">	embed google maps</a></small></div>
-                <style>
-                    #gmap_canvas img {
-                        max-width: none !important;
-                        background: none !important;
-                    }
-                </style>
+            <div style='overflow:hidden;height:440px;width:100%;'>
+                <div id='gmap_canvas' style='height:100%;width:100%;'></div><div><small><a href="http://embedgooglemaps.com">	embed google maps</a></small></div>
+                
             </div>
-
-
+            <div style="text-align:center">
+                     
+                    <label class="ui-btn ui-corner-all ui-shadow">Closet Store:     <span id="message"></span><br/><span id="address"></span></label>
+            </div>
         </div>
 
-        <div data-role="footer" data-position="fixed" data-theme="b">
+        <div data-role="footer" data-position="fixed" data-theme="a">
             <h5>pets shops &nbsp &copy; &nbsp group11</h5>
         </div>
     </div>
@@ -532,16 +541,17 @@
 
 
     <!--the order page-->
-    <div data-role="page" id="OrderPage" data-theme="b">
+    <div data-role="page" id="OrderPage" data-theme="a">
 
 
 
         <div data-role="header">
             <div data-role="navbar">
                 <ul>
-                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
+                    <li><a href="#WelcomePage" class="ui-btn-active ui-state-persist" data-icon="home">home</a></li>
+                    <li><a href="#ShopPage" data-icon="bars">shops</a></li>
 
-                    <li><a href="#MapPage">Map page</a></li>
+                    <li><a href="#MapPage" data-icon="location">Map page</a></li>
 
                 </ul>
             </div>
@@ -564,7 +574,7 @@
 
 
 
-        <div data-role="footer" data-position="fixed" data-theme="d">
+        <div data-role="footer" data-position="fixed" data-theme="a">
             <h5>pets  Shops &nbsp &copy; &nbsp  group11</h5>
         </div>
     </div>
@@ -572,16 +582,17 @@
 
 
     <!--the items page-->
-    <div data-role="page" id="ItemsPage" data-theme="b">
+    <div data-role="page" id="ItemsPage" data-theme="a">
 
 
 
         <div data-role="header">
             <div data-role="navbar">
                 <ul>
-                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
+                    <li><a href="#WelcomePage" class="ui-btn-active ui-state-persist" data-icon="home">home</a></li>
+                    <li><a href="#ShopPage" data-icon="bars" >shops</a></li>
 
-                    <li><a href="#MapPage">Map page</a></li>
+                    <li><a href="#MapPage" data-icon="location">Map page</a></li>
 
                 </ul>
             </div>
@@ -597,7 +608,7 @@
 
 
 
-        <div data-role="footer" data-position="fixed" data-theme="d">
+        <div data-role="footer" data-position="fixed" data-theme="a">
             <h5>pets  Shops &nbsp &copy; &nbsp  group11</h5>
         </div>
     </div>
@@ -606,16 +617,17 @@
 
 
     <!--the OrderItemPage -->
-    <div data-role="page" id="OrderItemPage" data-theme="b">
+    <div data-role="page" id="OrderItemPage" data-theme="a">
 
 
 
         <div data-role="header">
             <div data-role="navbar">
                 <ul>
-                    <li><a href="#ShopPage" class="ui-state-persist">shops</a></li>
+                    <li><a href="#WelcomePage" class="ui-btn-active ui-state-persist" data-icon="home">home</a></li>
+                    <li><a href="#ShopPage" data-icon="bars">shops</a></li>
 
-                    <li><a href="#MapPage">Map page</a></li>
+                    <li><a href="#MapPage"data-icon="location">Map page</a></li>
 
                 </ul>
             </div>
@@ -638,7 +650,7 @@
 
 
 
-        <div data-role="footer" data-position="fixed" data-theme="d">
+        <div data-role="footer" data-position="fixed" data-theme="a">
             <h5>pets  Shops &nbsp &copy; &nbsp  group11</h5>
         </div>
     </div>

@@ -97,7 +97,7 @@
                 }
                 function fail(error) {
                     drawMap(defaultLatLng);  // Failed to find location, show default map
-                    $('#distance').text("Couldn't get location");
+                    $('#message').text("Couldn't get location");
                 }
                 // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
                 navigator.geolocation.getCurrentPosition(success, fail, { maximumAge: 500000, enableHighAccuracy: true, timeout: 6000 });

@@ -2,7 +2,7 @@
     geocoder = new google.maps.Geocoder();
 
     var myTrip = new Array();
-    var defaultLatLng = new google.maps.LatLng(34.0983425, -118.3267434);  // Default to Hollywood, CA when no geolocation support
+    var defaultLatLng = new google.maps.LatLng(32.0983425, 32.2267434);  // Default to Hollywood, CA when no geolocation support
     if (navigator.geolocation) {
         function success(pos) {
             // Location found, show map with these coordinates
@@ -12,6 +12,7 @@
         }
         function fail(error) {
             drawMap(defaultLatLng);  // Failed to find location, show default map
+            drawmarkers(defaultLatLng)
             $('#message').text("Couldn't get location");
         }
         // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
@@ -54,6 +55,34 @@
     }
 
 
+    function drawmarkers(loc)
+    {
+
+        var shops = getshops();
+        if (arr.length == shops.length) {
+           
+            var map = new google.maps.Map(document.getElementById("gmap_canvas"), {
+                zoom: 10,
+                center: loc,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+            var marker;
+            var infowindow = new google.maps.InfoWindow();
+            var title = '</br><strong>location</strong></br>';
+            var add;
+            for (var i = 0; i < arr.length; i++) {
+
+                add = title + shops[i].Name + '</br>' + shops[i].Adress + '</br>';
+                
+                createMarker(add, arr[i].lat, arr[i].lng, infowindow, map, i);
+            }
+
+            
+
+        }
+
+
+    }
     function calcdist(myloc) {
 
 

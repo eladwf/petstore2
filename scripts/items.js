@@ -11,7 +11,7 @@ function wireEventsItemsPage() {
 
     $.support.cors = true;
     $.ajax({
-        url: "proj.ruppin.ac.il/cegroup11/prod/" + WebServiceURL + "/GetProducts",
+        url: "http://proj.ruppin.ac.il/cegroup11/prod/" + WebServiceURL + "/GetProducts",
         dataType: "json",
 
         type: "POST",

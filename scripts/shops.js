@@ -7,7 +7,7 @@
 function wireEventsShopPage() {
     WebServiceURL = "ShopsWS.asmx";
     $.ajax({
-        url: "proj.ruppin.ac.il/cegroup11/prod/" + WebServiceURL + "/GetShops",
+        url: "http://proj.ruppin.ac.il/cegroup11/prod/" + WebServiceURL + "/GetShops",
         dataType: "json",
 
         type: "POST",
@@ -60,7 +60,7 @@ function getshops() {
     WebServiceURL = "ShopsWS.asmx";
     $.support.cors = true;
     $.ajax({
-        url: WebServiceURL + "/GetShops",
+        url:"http://proj.ruppin.ac.il/cegroup11/prod/"+ WebServiceURL + "/GetShops",
         dataType: "json",
         async: false,
         type: "POST",

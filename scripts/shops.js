@@ -7,7 +7,7 @@
 function wireEventsShopPage() {
     WebServiceURL = "ShopsWS.asmx";
     $.ajax({
-        url: WebServiceURL + "/GetShops",
+        url: "proj.ruppin.ac.il/cegroup11/prod/" + WebServiceURL + "/GetShops",
         dataType: "json",
 
         type: "POST",

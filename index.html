@@ -2,10 +2,10 @@
 <html>
 <head>
    
-   
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
     <link rel="stylesheet" href="http://cdn.jtsage.com/datebox/1.4.5/jqm-datebox-1.4.5.min.css">
-    <link type="text/css" href="css/demos.css" rel="stylesheet">
+    
     <!-- NOTE: Script load order is significant! -->
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
@@ -18,15 +18,31 @@
     <script type="text/javascript" src="http://cdn.jtsage.com/datebox/1.4.5/jqm-datebox-1.4.5.mode.slidebox.min.js"></script>
     <script type="text/javascript" src="http://cdn.jtsage.com/datebox/1.4.5/jqm-datebox-1.4.5.mode.customflip.min.js"></script>
     <script type="text/javascript" src="http://cdn.jtsage.com/datebox/i18n/jqm-datebox.lang.utf8.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
     <script type="text/javascript">
     jQuery.extend(jQuery.mobile,
     {
       ajaxEnabled: false
     });
   
+
+    // Wait for device API libraries to load
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    // device APIs are available        
+    function onDeviceReady() {
+        //alert("PG - devicereadye");
+        $('#deviceProperties').html('Device Model: ' + device.model + '<br />' +
+                        'Device Cordova: ' + device.cordova + '<br />' +
+                        'Device Platform: ' + device.platform + '<br />' +
+                        'Device UUID: ' + device.uuid + '<br />' +
+                        'Device Version: ' + device.version + '<br />');
+    }
+
+
     </script>
     
-    <link href="themes/mytheme.css" rel="stylesheet" />
+    <!--link href="themes/mytheme.css" rel="stylesheet" /-->
     <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
    
     <title>pages</title>
@@ -51,6 +67,10 @@
             color: black;
          
         }
+
+
+
+
     </style>
     <script src="scripts/map.js"></script>
     <script src="scripts/shops.js"></script>
@@ -81,7 +101,7 @@
             
                 <h3>Welcome to pet shops mobile.</h3>
                  <p>here you can search for the closet shop to your location,<br>look for intersting items and much more  </p>
-           
+            <p id="deviceProperties">Loading device properties...</p>
 
             
         </div>
@@ -173,7 +193,7 @@
                 <input type="text" data-role="datebox"  name="date"  id="date" data-options='{"mode":"calbox" ,"afterToday":true,"maxDays":60,"blackDays":[6]}'>
                 
                 <label for="time">and hour:</label>
-                <input type="time" name="time" id="time">
+                <input type="text" data-role="datebox" name="time" id="time" data-options='{"mode":"timebox","timeFormat":24,"maxHour":22,"minHour":8,"useInline":false,"useInlineAlign":"center"}'>
                 <label for="phone">phone:</label>
                 <input type="number" name="phone" id="phone" placeholder="Your phone..">
             </div>
@@ -247,7 +267,7 @@
 
             <div class="ui-field-contain">
                 <label for="email">email:</label>
-                <input type="email" name="email" id="email" placeholder="name@gmail..">
+                <input type="email" name="email" id="email" placeholder="name@email..">
 
                 <label for="uphone">phone:</label>
                 <input type="number" name="uphone" id="uphone">

@@ -6,7 +6,7 @@ function wireEventsOrderPage() {
         WebServiceURL = "OrderWS.asmx";
         $.support.cors = true;
         $.ajax({
-            url: WebServiceURL + "/InsertOrder",
+            url: "proj.ruppin.ac.il/cegroup11/prod/" + WebServiceURL + "/InsertOrder",
             dataType: "json",
             type: "POST",
             data: "{'UserName':'" + $("#user").val() + "'," +

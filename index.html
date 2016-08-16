@@ -1,19 +1,34 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <style>
-        #gmap_canvas img {
-            max-width: none !important;
-            background: none !important;
-        }
-    </style>
-    <link href="themes/mytheme.css" rel="stylesheet" />
+   
+   
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" href="http://cdn.jtsage.com/datebox/1.4.5/jqm-datebox-1.4.5.min.css">
+    <link type="text/css" href="css/demos.css" rel="stylesheet">
+    <!-- NOTE: Script load order is significant! -->
+    <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src="http://cdn.jtsage.com/external/jquery.mousewheel.min.js"></script>
+    <script type="text/javascript" src="http://dev.jtsage.com/jQM-DateBox/js/doc.js"></script>
+    <script type="text/javascript" src="http://cdn.jtsage.com/datebox/1.4.5/jqm-datebox-1.4.5.core.min.js"></script>
+    <script type="text/javascript" src="http://cdn.jtsage.com/datebox/1.4.5/jqm-datebox-1.4.5.mode.calbox.min.js"></script>
+    <script type="text/javascript" src="http://cdn.jtsage.com/datebox/1.4.5/jqm-datebox-1.4.5.mode.datebox.min.js"></script>
+    <script type="text/javascript" src="http://cdn.jtsage.com/datebox/1.4.5/jqm-datebox-1.4.5.mode.flipbox.min.js"></script>
+    <script type="text/javascript" src="http://cdn.jtsage.com/datebox/1.4.5/jqm-datebox-1.4.5.mode.slidebox.min.js"></script>
+    <script type="text/javascript" src="http://cdn.jtsage.com/datebox/1.4.5/jqm-datebox-1.4.5.mode.customflip.min.js"></script>
+    <script type="text/javascript" src="http://cdn.jtsage.com/datebox/i18n/jqm-datebox.lang.utf8.js"></script>
+    <script type="text/javascript">
+    jQuery.extend(jQuery.mobile,
+    {
+      ajaxEnabled: false
+    });
+  
+    </script>
     
-    <link rel="stylesheet" href="/themes/jquery.mobile.icons.min.css" />
-    <link href="themes/jquery.mobile.icons.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
-    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <link href="themes/mytheme.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+   
     <title>pages</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <link href="styles/MyStSh.css" rel="stylesheet" type="text/css" />
@@ -24,434 +39,25 @@
             $.mobile.defaultPageTransition = "slide";
         });
     </script>
-    <script src="scripts/jquery.mobile-1.4.5.min.js"></script>
-    <script type="text/javascript">
-
-        $(document).on("pageinit", "#ShopPage", function (event) {
-            wireEventsShopPage();
-        });
-
-        function wireEventsShopPage() {
-            WebServiceURL = "ShopsWS.asmx";
-            $.ajax({
-                url: WebServiceURL + "/GetShops",
-                dataType: "json",
-
-                type: "POST",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                error: function (err) {
-                    alert("errornir: " + JSON.stringify(err));
-                },
-                success: function (data) {
-                    if (data.d != undefined) {
-
-
-                        $("#ShopPage").find("[data-role='content']").empty();
-                        $("#ShopPage").find("[data-role='content']").append('<div id="shop" data-role="controlgroup"></div>');
-                        
-          
-
-                        for (var i = 0; i < data.d.length; i++) {
-
-
-
-                            $("#ShopPage").append("<div data-role='panel' id='myPanels" + i + "'>    <h2>" + data.d[i].Name + "</h2>" +
-                                " <p>contact us</p><p>Phone:" + data.d[i].Phone + "</p><p>Adress" + data.d[i].Adress + "</p>" +
-                            "<a name='" + data.d[i].Name + "' onclick='myshop(this.name)' href='#OrderPage' data-rel='close' class='ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-a ui-icon-arrow-r ui-btn-icon-left'>enter store</a> </div>");
-
-                            $("#shop").append("<a  href='#myPanels" + i + "' class='ui-btn  ui-shadow'>" + data.d[i].Name + "</a>");
-                            if (typeof (Storage) !== "undefined") {
-                                sessionStorage[data.d[i].Name] = data.d[i].Id;
-                            }
-
-                        }
-                        $("[data-role=panel]").panel().enhanceWithin();
-
-                    }
-                }
-            });
-
-
+    <style>
+        #gmap_canvas img {
+            max-width: none !important;
+            background: none !important;
         }
 
-        function myshop(name) {
-            if (typeof (Storage) !== "undefined") {
-                sessionStorage.name = name;
-            }
-            location.reload();
+     
+
+        .gm-style-iw {
+            color: black;
+         
         }
-
-
-        $(document).on("pageinit", "#MapPage", function () {
-            geocoder = new google.maps.Geocoder();
-
-            var myTrip = new Array();
-            var defaultLatLng = new google.maps.LatLng(34.0983425, -118.3267434);  // Default to Hollywood, CA when no geolocation support
-            if (navigator.geolocation) {
-                function success(pos) {
-                    // Location found, show map with these coordinates
-                    var myloc = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-                    drawMap(myloc);
-                    calcdist(myloc);
-                }
-                function fail(error) {
-                    drawMap(defaultLatLng);  // Failed to find location, show default map
-                    $('#message').text("Couldn't get location");
-                }
-                // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
-                navigator.geolocation.getCurrentPosition(success, fail, { maximumAge: 500000, enableHighAccuracy: true, timeout: 6000 });
-            } else {
-                drawMap(defaultLatLng);  // No geolocation support, show default map
-            }
-            function drawMap(latlng) {
-              
-
-                var myOptions = {
-                    zoom: 10,
-                    center: latlng,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
-                };
-                var map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
-                // Add an overlay to the map of current lat/lng
-
-            }
-
-            function codeAddress(callback) {
-                var shops = getshops();
-
-
-                var arr = [];
-                for (var i = 0; i < shops.length; i++)
-                    geocoder.geocode({ 'address': shops[i].Adress }, function (results, status) {
-                        if (status == google.maps.GeocoderStatus.OK) {
-                            debugger;
-                            lat = results[0].geometry.location.lat();
-                            lng = results[0].geometry.location.lng();
-                            arr.push({ lat: lat, lng: lng })
-                            callback(arr);
-                        } else {
-                            alert("Geocode was not successful for the following reason: " + status);
-                        }
-                    });
-
-
-            }
-
-
-            function calcdist(myloc) {
-
-                
-                codeAddress(function (arr) {
-
-                    var shops = getshops();
-                    if (arr.length == shops.length) {
-                        var distances = [];
-                        var map = new google.maps.Map(document.getElementById("gmap_canvas"), {
-                            zoom: 10,
-                            center: myloc,
-                            mapTypeId: google.maps.MapTypeId.ROADMAP
-                        });
-                        var marker;
-                        var infowindow = new google.maps.InfoWindow();
-                        var title='</br><strong>location</strong></br>' ;
-                        var add;
-                        for (var i = 0; i < arr.length; i++) {
-                            
-                            add = title + shops[i].Name + '</br>' + shops[i].Adress + '</br>';
-                            distances.push(google.maps.geometry.spherical.computeDistanceBetween(myloc, new google.maps.LatLng(arr[i].lat, arr[i].lng)));
-                            createMarker(add, arr[i].lat, arr[i].lng, infowindow,map,i);
-                        }
-
-                        var x = getmin(distances);
-
-                        minimumindex = distances.indexOf(x);
-                        $('#message').text(shops[minimumindex].Name);
-                        $('#address').text(shops[minimumindex].Adress);
-
-                    }
-                   
-                });
-
-        }
-
-        });
-
-        function createMarker(add, lat, lng,infowindow,map,i) {
-
-            var marker = new google.maps.Marker({
-                position: new google.maps.LatLng(lat, lng),
-                map: map,
-            });
-            google.maps.event.addListener(marker, 'click', (function (marker, i) {
-                return function () {
-                    infowindow.setContent(add);
-                    infowindow.open(map, marker);
-                }
-            })(marker, i));
-
-
-
-        }
-        $(document).on("pageinit", "#OrderPage", function (event) {
-            wireEventsOrderPage();
-        });
-        function wireEventsOrderPage() {
-            $('#orderbtn').on('click', function () {
-                WebServiceURL = "OrderWS.asmx";
-                $.support.cors = true;
-                $.ajax({
-                    url: WebServiceURL + "/InsertOrder",
-                    dataType: "json",
-                    type: "POST",
-                    data: "{'UserName':'" + $("#user").val() + "'," +
-                            "'Phone':'" + $("#phone").val() + "'," +
-                            "'date':'" + $("#date").val() + "'," +
-                            "'time':'" + $("#time").val() + "'}",
-                    contentType: "application/json; charset=utf-8",
-                    error: function (err) {
-                        alert("errornir: " + JSON.stringify(err));
-                    },
-                    success: function (data) {
-                        if (data["d"] == 1) {
-                            alert("you register succesfuly");
-                        }
-                        else {
-                            alert("please try another date or hour");
-                        }
-                    }
-                });
-            });
-
-
-
-        }
-
-        //____________items___________________
-        $(document).on("pageinit", "#ItemsPage", function () {
-            wireEventsItemsPage();
-
-        });
-
-
-        function wireEventsItemsPage() {
-
-            WebServiceURL = "Products.asmx";
-           
-            $.support.cors = true;
-            $.ajax({
-                url: WebServiceURL + "/GetProducts",
-                dataType: "json",
-
-                type: "POST",
-                data: "{'id':'" + sessionStorage[sessionStorage.name] + "'}",
-                contentType: "application/json; charset=utf-8",
-                error: function (err) {
-                    alert("errornir: " + JSON.stringify(err));
-                },
-                success: function (data) {
-
-                    var liItem = " <li ><a href='#' ";
-                   
-                    for (var i = 0; i < data.d.length; i++) {
-                        var img = "<img src='" + data.d[i].imgUrl + "'height='100' width='100'>";
-                        var itemtoadd = liItem + "class='shopitems'" + " id='" + data.d[i].imgUrl + "' >" + img + "<h2>" + data.d[i].Title + "</h2></a></li>";
-                        $('#itemlist').append(itemtoadd).listview('refresh');
-
-                    }
-                    $(".shopitems").bind('click', function () {
-
-                        var target = $(this),
-                          brand = target.find("h2").html(),
-
-                          short = target.attr("id").slice(6, target.attr("id").length - 4),
-                          closebtn = '<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>',
-                          header = '<div data-role="header"><h7>' + brand + '</h7></div>',
-
-                         
-                        img = '<img src=/pics/' + short + '.jpg alt="' + brand + '" class="photo" >',
-                          popup = '<div data-role="popup" id="popup-' + short + '" data-short="' + short + '" data-theme="a" data-overlay-theme="a" data-corners="false" data-tolerance="15"></div>';
-                        link = '</br><a name="' + short + '" onclick=saveItem(this.name) href="#OrderItemPage" class="ui-btn    ui-icon-arrow-r ">make a order</a>'
-
-                        // Create the popup.
-
-                        $(header)
-                            .appendTo($(popup)
-                                .appendTo($.mobile.activePage)
-                                .popup())
-                            .toolbar()
-                            .before(closebtn)
-                            .after(img).append(link);
-                        // Wait with opening the popup until the popup image has been loaded in the DOM.
-                        // This ensures the popup gets the correct size and position
-                        $(".photo", "#popup-" + short).load(function () {
-                            // Open the popup
-                            $("#popup-" + short).popup("open");
-                            // Clear the fallback
-                            clearTimeout(fallback);
-                        });
-                        // Fallback in case the browser doesn't fire a load event
-                        var fallback = setTimeout(function () {
-                            $("#popup-" + short).popup("open");
-                        }, 2000);
-                    });
-                    // Set a max-height to make large images shrink to fit the screen.
-                    $(document).on("popupbeforeposition", ".ui-popup", function () {
-                        var image = $(this).children("img"),
-                            height = image.height(),
-                            width = image.width();
-                        // Set height and width attribute of the image
-                        $(this).attr({ "height": height, "width": width });
-                        // 68px: 2 * 15px for top/bottom tolerance, 38px for the header.
-                        var maxHeight = $(window).height() - 68 + "px";
-                        $("img.photo", this).css("max-height", maxHeight);
-                    });
-                    // Remove the popup after it has been closed to manage DOM size
-                    $(document).on("popupafterclose", ".ui-popup", function () {
-                        $(this).remove();
-
-                    });
-                }
-            });
-
-        }
-
-        function saveItem(itemname) {
-            if (typeof (Storage) !== "undefined")
-                sessionStorage['item'] = itemname;
-        }
-
-        $(document).on("pageinit", "#OrderItemPage", function () {
-            wireEventsOrderItemPage();
-
-        });
-        function wireEventsOrderItemPage() {
-            $('#placeorder').on('click', function () {
-                WebServiceURL = "OrderItemWS.asmx";
-
-                $.support.cors = true;
-                $.ajax({
-                    url: WebServiceURL + "/addOrder",
-                    dataType: "json",
-
-                    type: "POST",
-                    data: "{'Email':'" + $("#email").val() + "'," +
-                                "'Phone':'" + $("#uphone").val() + "'," +
-                                "'ProductName':'" + sessionStorage['item'] + "'," +
-                               "'shopid':'" + sessionStorage[sessionStorage.name] +
-                                "'}",
-                    contentType: "application/json; charset=utf-8",
-                    error: function (err) {
-                        alert("errornir: " + JSON.stringify(err));
-                    },
-                    success: function (data) {
-
-
-
-
-                        if (data.d) {
-                            msg('<h2>your orderd was registerd successfully !<h2></br><p>see  you in our store ;) !</p>', 'info', function () {
-                                alert('call back function');// this line is not called
-                            });
-
-                        } else {
-                            msg('failed', 'info', function () {
-                                alert('call back function');// this line is not called
-                            });
-                        }
-                    }
-                });
-            });
-            function msg(_msg, _title, _okCB) {
-                try {
-                    if (_title == null || _title == undefined || _title == '') {
-                        _title = 'Information';
-                    }
-                    if (_msg == null || _msg == undefined || _msg == '') {
-                        _msg = 'Error found. Please contact your administrator.';
-                    }
-                    // Create it in memory
-                    var dlg = $("<div id=\"dlgAlert\" class=\"ui-corner-all ui-shadow\" data-close-btn=\"right\" />")
-                        .attr("data-role", "dialog")
-                        .attr("id", "dialog");
-
-                    var header = $("<div />")
-                        .attr("data-role", "header")
-                        .attr("role", "banner")
-                        .html("<h2>" + _title + "</h2>");
-
-                    var content = $("<div style=\"padding: 15px;\" />")
-                        .attr("data-role", "content")
-                        .append($("<p />").html(_msg));
-
-                    content.append("<div ><a class='dlgalert' href='#index' data-rel='back'  data-role=\"button\"    data-theme=\"a\" >Close</a></div>");
-
-                    dlg.append(header).trigger('create');
-                    dlg.append(content).trigger('create');
-
-
-
-                    dlg.dialog({
-                        close: function (event, ui) {
-                            _okCB();  //this line is not called
-                        }
-                    }).appendTo($.mobile.pageContainer);
-
-                    $.mobile.changePage(dlg, {
-                        transition: "pop",
-                        role: "dialog",
-                        reverse: false
-
-                    });
-
-
-
-                } catch (e) {
-                    alert(e);
-                }
-
-            }
-        }
-
-        function getshops() {
-            var shops = [];
-            WebServiceURL = "ShopsWS.asmx";
-            $.support.cors = true;
-            $.ajax({
-                url: WebServiceURL + "/GetShops",
-                dataType: "json",
-                async: false,
-                type: "POST",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                error: function (err) {
-                    alert("errornir: " + JSON.stringify(err));
-                },
-                success: function (data) {
-                    if (data["d"] != undefined) {
-                        for (var i = 0; i < data["d"].length; i++)
-                            shops.push(data["d"][i])
-
-
-                    }
-
-                }
-            });
-
-            return shops;
-        }
-        var getmin = function (values) {
-            if (values.length == 0)
-                return -1;
-            var min = values[0];
-            for (var i = 1; i < values.length; i++)
-                if (min > values[i])
-                    min = values[i];
-            return min;
-        }
-
-
-    </script>
+    </style>
+    <script src="scripts/map.js"></script>
+    <script src="scripts/shops.js"></script>
+    <script src="scripts/orders.js"></script>
+    <script src="scripts/orderitems.js"></script>
+
+    <script src="scripts/items.js"></script>
 </head>
 <body>
 
@@ -475,10 +81,11 @@
             
                 <h3>Welcome to pet shops mobile.</h3>
                  <p>here you can search for the closet shop to your location,<br>look for intersting items and much more  </p>
-
+           
 
             
         </div>
+        
         <div data-role="footer" data-position="fixed" data-theme="a">
             <h5>pets Shops  &nbsp &copy; &nbsp  group11</h5>
         </div>
@@ -503,6 +110,7 @@
         </div>
         <div data-role="content">
             
+           
         </div>
         <div data-role="footer" data-position="fixed" data-theme="a">
             <h5>pets Shops  &nbsp &copy; &nbsp  group11</h5>
@@ -562,8 +170,9 @@
                 <label for="fullname">Full name:</label>
                 <input type="text" name="fullname" id="fullname">
                 <label for="date">Date of Appointment:</label>
-                <input type="date" name="date" id="date">
-                <label for="tiem">and hour:</label>
+                <input type="text" data-role="datebox"  name="date"  id="date" data-options='{"mode":"calbox" ,"afterToday":true,"maxDays":60,"blackDays":[6]}'>
+                
+                <label for="time">and hour:</label>
                 <input type="time" name="time" id="time">
                 <label for="phone">phone:</label>
                 <input type="number" name="phone" id="phone" placeholder="Your phone..">

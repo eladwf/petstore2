@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Services;
 using System.Data.SqlClient;
 using System.Web.Configuration;
+using System.Globalization;
 
 /// <summary>
 /// Summary description for OrderWS
@@ -12,10 +13,12 @@ using System.Web.Configuration;
 [WebService(Namespace = "http://petshop.org/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
- [System.Web.Script.Services.ScriptService]
-public class OrderWS : System.Web.Services.WebService {
+[System.Web.Script.Services.ScriptService]
+public class OrderWS : System.Web.Services.WebService
+{
 
-    public OrderWS () {
+    public OrderWS()
+    {
 
         //Uncomment the following line if using designed components 
         //InitializeComponent(); 
@@ -23,32 +26,72 @@ public class OrderWS : System.Web.Services.WebService {
 
 
     [WebMethod]
-    public int InsertOrder(string UserName,string Phone,string date,string time)
+    public List<DateTime> InsertOrder(string UserName, string Phone, string date, string time)
     {
         string conStr = WebConfigurationManager.ConnectionStrings["conString"].ConnectionString;
+
+        List<DateTime> meetings = new List<DateTime>();
+
+
 
         SqlConnection con = new SqlConnection(conStr);
         con.Open();
         // modify the format depending upon input required in the column in database 
-        SqlCommand checkcom = new SqlCommand("SELECT * FROM appointments ", con);
+        SqlCommand checkcom = new SqlCommand("select * from meetings ", con);
         SqlDataReader reader = checkcom.ExecuteReader();
 
 
-       
+        DateTime myDate;
+
+        string str;
+        bool exist = false;
+        TimeSpan ts;
+
+        string t;
+        string s;
         while (reader.Read())
         {
 
-           var x=reader["date"].ToString();
-            var str = x.Substring(0, 16);
+            t = reader["time"].ToString();
+            try
+            {
+                myDate = DateTime.Parse(reader["date"].ToString());
+            }
+            catch (Exception e)
+            {
+                myDate = DateTime.Now;
+            }
+            s = myDate.ToString("dd/MM/yyyy");
+            try
+            {
+                ts = TimeSpan.Parse(t);
+            }
+            catch (Exception e)
+            {
+                ts = DateTime.Now.TimeOfDay;
+            }
+            myDate = myDate.Add(ts);
+            meetings.Add(myDate);
+            str = s + " " + t.Substring(0, t.Length - 3);
             if (str.Equals(date + " " + time))
-            return -1;
+            {
+                exist = true;
+            }
         }
         con.Close();
-        con.Open();
-        SqlCommand com = new SqlCommand("INSERT INTO Appointments VALUES('" + UserName + "','" + date+" "+time +"','"+Phone+ "')", con);
-      
-        int rows = com.ExecuteNonQuery();
-        con.Close();            
-        return rows;
-    }    
+        if (!exist)
+        {
+
+            con.Open();
+            SqlCommand com = new SqlCommand("INSERT INTO meetings VALUES('" + date + "','" + time + "','" + UserName + "','" + Phone + "')", con);
+
+            int rows = com.ExecuteNonQuery();
+
+            con.Close();
+            return null;
+        }
+
+
+        return meetings;
+    }
 }

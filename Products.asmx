@@ -8,17 +8,16 @@ using System.Web.Configuration;
 using System.Web.Services;
 
 /// <summary>
-/// Summary description for ShopsWS
+/// Summary description for Products
 /// </summary>
-[WebService(Namespace = "http://petshop.org/")]
+[WebService(Namespace = "http://petsshop.org/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
  [System.Web.Script.Services.ScriptService]
-
-public class ShopsWS : System.Web.Services.WebService
+public class Products : System.Web.Services.WebService
 {
 
-    public ShopsWS()
+    public Products()
     {
 
         //Uncomment the following line if using designed components 
@@ -26,66 +25,60 @@ public class ShopsWS : System.Web.Services.WebService
     }
 
     [WebMethod]
-    public string[] GetShopsAdress()
+    public List<ProductClass> GetProducts(string id)
     {
-        string[] adrress;
+        List<ProductClass> items = new List<ProductClass>();
         string conStr = WebConfigurationManager.ConnectionStrings["conString"].ConnectionString;
         SqlConnection con = new SqlConnection(conStr);
+
+       
+        SqlCommand comshopsandproducts = new SqlCommand("SELECT ProductId FROM ShopsProducts where ShopId= "+id, con);
         con.Open();
-        SqlCommand com = new SqlCommand("SELECT * FROM Shops ", con);
-
-        SqlCommand comm = new SqlCommand("SELECT COUNT(*) FROM Shops", con);
-        Int32 count = (Int32)comm.ExecuteScalar();
-
-        adrress = new string[count];
-        SqlDataReader reader = com.ExecuteReader();
-
-
-        int i = 0;
+        SqlDataReader reader = comshopsandproducts.ExecuteReader();
+        List<string> Ids = new List<string>();
         while (reader.Read())
         {
 
-            adrress[i] = reader["Adress"].ToString();
-                i++;
+            Ids.Add(reader["ProductId"].ToString());
+
         }
+
+
         con.Close();
-        return adrress;
+        string str = "";
+        foreach (var item in Ids)
+        {
+            str += "'" + item + "',";
+        }
+        str = str.Remove(str.Length-1);
 
-    }
-
-    [WebMethod]
-    public List<Shop> GetShops()
-    {
-        List<Shop> items = new List<Shop>();
-        string conStr = WebConfigurationManager.ConnectionStrings["conString"].ConnectionString;
-        SqlConnection con = new SqlConnection(conStr);
+        SqlCommand com = new SqlCommand("SELECT * FROM Products where id in("+str+")", con);
         con.Open();
-        SqlCommand com = new SqlCommand("SELECT * FROM Shops ", con);
-
-       
-
-         
-        SqlDataReader reader = com.ExecuteReader();
 
 
-       
+
+        reader = com.ExecuteReader();
+
+
+
         while (reader.Read())
         {
 
-            items.Add(new Shop {
-                Name = reader["ShopName"].ToString(),
-                Phone = reader["PhoneNumber"].ToString(),
-                Adress = reader["Adress"].ToString(),
-                Id =  reader["id"].ToString()
+            items.Add(new ProductClass
+            {
+                Title = reader["Title"].ToString(),
+                imgUrl = reader["imgUrl"].ToString(),
+                description = reader["description"].ToString()
+
 
             });
-           
+
         }
         con.Close();
 
         return items;
     }
-public class ProductClass
+        public class ProductClass
 {
     public string Title{ get; set; }
     public string imgUrl { get; set; }
@@ -99,5 +92,9 @@ public class ProductClass
     }
 }
 
-
 }
+
+
+
+
+

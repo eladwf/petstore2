@@ -25,7 +25,7 @@ function wireEventsItemsPage() {
             var liItem = " <li ><a href='#' ";
 
             for (var i = 0; i < data.d.length; i++) {
-                var img = "<img src='" + data.d[i].imgUrl + "'height='100' width='100'>";
+                var img = "<img src='./" + data.d[i].imgUrl + "'height='100' width='100'>";
                 var itemtoadd = liItem + "class='shopitems'" + " id='" + data.d[i].imgUrl + "' >" + img + "<h2>" + data.d[i].Title + "</h2></a></li>";
                 $('#itemlist').append(itemtoadd).listview('refresh');
 
@@ -40,7 +40,7 @@ function wireEventsItemsPage() {
                   header = '<div data-role="header"><h7>' + brand + '</h7></div>',
 
 
-                img = '<img src=/pics/' + short + '.jpg alt="' + brand + '" class="photo" >',
+                img = '<img src=./pics/' + short + '.jpg alt="' + brand + '" class="photo" >',
                   popup = '<div data-role="popup" id="popup-' + short + '" data-short="' + short + '" data-theme="a" data-overlay-theme="a" data-corners="false" data-tolerance="15"></div>';
                 link = '</br><a name="' + short + '" onclick=saveItem(this.name) href="#OrderItemPage" class="ui-btn    ui-icon-arrow-r ">make a order</a>'
 

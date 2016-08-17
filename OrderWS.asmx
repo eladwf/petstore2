@@ -27,54 +27,62 @@ public class OrderWS : System.Web.Services.WebService
 
 
     [WebMethod]
-    public List<DateTime> InsertOrder(string UserName, string Phone, string date, string time)
+    public List<string> InsertOrder(string UserName, string Phone, string date, string shopname,string time)
     {
         string conStr = WebConfigurationManager.ConnectionStrings["conString"].ConnectionString;
 
-        List<DateTime> meetings = new List<DateTime>();
+        List<string> meetings = new List<string>();
 
 
 
         SqlConnection con = new SqlConnection(conStr);
         con.Open();
         // modify the format depending upon input required in the column in database 
-        SqlCommand checkcom = new SqlCommand("select * from meetings ", con);
+        SqlCommand checkcom = new SqlCommand("select * from meetings where shopname='"+shopname+"'", con);
         SqlDataReader reader = checkcom.ExecuteReader();
 
 
-        DateTime myDate;
+        DateTime datadate=DateTime.ParseExact(date, "M'/'d'/'yyyy",
+                                  new CultureInfo("de-DE"));;
 
-        string str;
+        datadate= datadate.Add(Convert.ToDateTime(time).TimeOfDay);
+
+
         bool exist = false;
         TimeSpan ts;
 
-        string t;
-        string s;
+        DateTime DbDate;
         while (reader.Read())
         {
 
-            t = reader["time"].ToString();
+
             try
             {
-                myDate = DateTime.Parse(reader["date"].ToString());
+                DbDate = DateTime.Parse(reader["date"].ToString());
             }
             catch (Exception e)
             {
-                myDate = DateTime.Now;
+                DbDate = DateTime.Now;
             }
-            s = myDate.ToString("dd/MM/yyyy");
+
+
+
             try
             {
-                ts = TimeSpan.Parse(t);
+                ts = TimeSpan.Parse(reader["time"].ToString());
             }
             catch (Exception e)
             {
                 ts = DateTime.Now.TimeOfDay;
             }
-            myDate = myDate.Add(ts);
-            meetings.Add(myDate);
-            str = s + " " + t.Substring(0, t.Length - 3);
-            if (str.Equals(date + " " + time))
+
+
+            DbDate = DbDate.Add(ts); //date and time from db
+
+            int result = DateTime.Compare(DbDate,datadate);
+            meetings.Add(DbDate.ToString());
+
+            if (result==0)
             {
                 exist = true;
             }
@@ -84,7 +92,7 @@ public class OrderWS : System.Web.Services.WebService
         {
 
             con.Open();
-            SqlCommand com = new SqlCommand("INSERT INTO meetings VALUES('" + date + "','" + time + "','" + UserName + "','" + Phone + "')", con);
+            SqlCommand com = new SqlCommand("INSERT INTO meetings VALUES('" + date + "','" + time + "','" + UserName + "','" + Phone + "','" + shopname + "')", con);
 
             int rows = com.ExecuteNonQuery();
 

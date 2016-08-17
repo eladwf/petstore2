@@ -3,30 +3,38 @@
 });
 function wireEventsOrderPage() {
     $('#orderbtn').on('click', function () {
-        WebServiceURL = "OrderWS.asmx";
+        WebServiceURL = "http://proj.ruppin.ac.il/cegroup11/prod/" + "OrderWS.asmx";
         $.support.cors = true;
         $.ajax({
-            url: "http://proj.ruppin.ac.il/cegroup11/prod/" + WebServiceURL + "/InsertOrder",
+            url:   WebServiceURL + "/InsertOrder",
             dataType: "json",
             type: "POST",
             data: "{'UserName':'" + $("#user").val() + "'," +
                     "'Phone':'" + $("#phone").val() + "'," +
                     "'date':'" + $("#date").val() + "'," +
+                    "'shopname':'" + sessionStorage.name + "'," +
                     "'time':'" + $("#time").val() + "'}",
             contentType: "application/json; charset=utf-8",
             error: function (err) {
                 alert("errornir: " + JSON.stringify(err));
             },
             success: function (data) {
-                if (data["d"] == 1) {
-                    msg('<h2>your appointment in' + $("#date").val() + '  ' + $("#time").val() + '<br>has been confrimed  !<h2></br><p>see  you in our store ;)!</p>', 'info', function () {
+
+               
+                if (data.d == null) {
+                    msg('<h2>your appointment in  ' + $("#date").val() + '  ' + $("#time").val() + '<br>has been confrimed  !<h2></br><p>see  you in our store ;)!</p>', 'info', function () {
 
                     });
 
 
                 }
                 else {
-                    msg('<h2>your appointment in' + $("#date").val() + '  ' + $("#time").val() + '<br>hasn\'t been confrimed  !<h2></br><p>see  you in our store ;)!</p>', 'info', function () {
+                    str = "";
+                    data.d.forEach(function (item) {
+                       
+                        str += "<br>" + item;
+                    });
+                    msg('<h2>sorry the current hour has been try another date or hour that isn\'t in this time  ' +str+ '!<h2></br><p>see  you in our store ;)!</p>', 'info', function () {
 
                     });
                 }

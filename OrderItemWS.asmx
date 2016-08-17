@@ -13,7 +13,7 @@ using System.Web.Services;
 [WebService(Namespace = "http://petshop.org/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
- [System.Web.Script.Services.ScriptService]
+[System.Web.Script.Services.ScriptService]
 public class OrderItemWS : System.Web.Services.WebService
 {
 
@@ -31,12 +31,22 @@ public class OrderItemWS : System.Web.Services.WebService
 
         SqlConnection con = new SqlConnection(conStr);
         con.Open();
-        SqlCommand com = new SqlCommand("INSERT INTO Orders VALUES('" + ProductName + "','" + Phone + "','" +  Email + "','"+shopid +"')", con);
+        SqlCommand com = new SqlCommand("select * from Orders where shopid='"+shopid+"'", con);
+        SqlDataReader reader = com.ExecuteReader();
+        while (reader.Read())
+        {
+            if (Phone.Equals(reader["CustmerPhone"].ToString()) && Email.Equals(reader["CustomerMail"].ToString()) && ProductName.Equals(reader["ProductName"].ToString()))
+                return true;
+        }
+        con.Close();
+        con.Open();
+        com = new SqlCommand("INSERT INTO Orders VALUES('" + ProductName + "','" + Phone + "','" +  Email + "','"+shopid +"')", con);
+
 
         int rows = com.ExecuteNonQuery();
         con.Close();
         if (rows==1)
-        return true;
+            return true;
 
         return false;
     }

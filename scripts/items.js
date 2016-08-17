@@ -25,7 +25,7 @@ function wireEventsItemsPage() {
             var liItem = " <li ><a href='#' ";
 
             for (var i = 0; i < data.d.length; i++) {
-                var img = "<img src='./" + data.d[i].imgUrl + "'height='100' width='100'>";
+                var img = "<img src='." + data.d[i].imgUrl + "'height='100' width='100'>";
                 var itemtoadd = liItem + "class='shopitems'" + " id='" + data.d[i].imgUrl + "' >" + img + "<h2>" + data.d[i].Title + "</h2></a></li>";
                 $('#itemlist').append(itemtoadd).listview('refresh');
 

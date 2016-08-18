@@ -3,13 +3,34 @@
 });
 function wireEventsOrderPage() {
     $('#orderbtn').on('click', function () {
+
+        
+        if (($("#fullname").val() == "" || $("#fullname").val() == null) || ($("#phone").val() == "" || $("#phone").val() == null)
+            || ($("#date").val() == "" || $("#date").val() == null)
+            || ($("#time").val() == "" || $("#time").val() == null))
+        {
+            msg('<h2>all field must  be filled out!</h2>', 'info', function () {
+
+            });
+            return;
+        }
+
+        if (!phonenumber($("#phone").val())) {
+            msg('<h2>invalid phone number!</h2>', 'info', function () {
+
+            });
+            return;
+
+        }
+
+
         WebServiceURL = "http://proj.ruppin.ac.il/cegroup11/prod/" + "OrderWS.asmx";
         $.support.cors = true;
         $.ajax({
             url:   WebServiceURL + "/InsertOrder",
             dataType: "json",
             type: "POST",
-            data: "{'UserName':'" + $("#user").val() + "'," +
+            data: "{'UserName':'" + $("#fullname").val() + "'," +
                     "'Phone':'" + $("#phone").val() + "'," +
                     "'date':'" + $("#date").val() + "'," +
                     "'shopname':'" + sessionStorage.name + "'," +

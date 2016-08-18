@@ -57,10 +57,10 @@ function myshop(name) {
 
 function getshops() {
     var shops = [];
-    WebServiceURL = "ShopsWS.asmx";
+    WebServiceURL = "http://proj.ruppin.ac.il/cegroup11/prod/" + "ShopsWS.asmx";
     $.support.cors = true;
     $.ajax({
-        url:"http://proj.ruppin.ac.il/cegroup11/prod/"+ WebServiceURL + "/GetShops",
+        url: WebServiceURL + "/GetShops",
         dataType: "json",
         async: false,
         type: "POST",

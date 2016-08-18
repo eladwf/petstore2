@@ -4,11 +4,38 @@
 });
 function wireEventsOrderItemPage() {
     $('#placeorder').on('click', function () {
-        WebServiceURL = "OrderItemWS.asmx";
+        debugger;
+        if (($("#email").val() == "" || $("#email").val() == null) || ($("#uphone").val() == "" || $("#uphone").val() == null))
+        {
+
+            msg('<h2>all field must  be filled out!</h2>', 'info', function () {
+
+            });
+            
+            return;
+        }
+        if (!phonenumber($("#uphone").val()))
+        {
+            msg('<h2>invalid phone number!</h2>', 'info', function () {
+
+            });
+            return;
+
+        }
+            if (!validateEmail($("#email").val()))
+            {
+                msg('<h2>invalid maill adress!</h2>', 'info', function () {
+
+                });
+                return;
+            }
+
+
+            WebServiceURL = "http://proj.ruppin.ac.il/cegroup11/prod/" + "OrderItemWS.asmx";
 
         $.support.cors = true;
         $.ajax({
-            url: "http://proj.ruppin.ac.il/cegroup11/prod/" + WebServiceURL + "/addOrder",
+            url:  WebServiceURL + "/addOrder",
             dataType: "json",
 
             type: "POST",
@@ -89,3 +116,13 @@ function wireEventsOrderItemPage() {
 
     }
 }
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
+function phonenumber(inputtxt)  
+{  
+    var phoneno = /^\d{10}$/;  
+    return phoneno.test(inputtxt);
+    
+}  

@@ -1,26 +1,45 @@
 ﻿
-
-
 $(document).on("pageinit", "#MapPage", function () {
-    shops = getshops();
+   
 
     geocoder = new google.maps.Geocoder();
 
     var myTrip = new Array();
-    var defaultLatLng = new google.maps.LatLng(32.0983425, 32.2267434);
+    var defaultLatLng = new google.maps.LatLng(32.0983425, 34.87);
     if (navigator.geolocation) {
         function success(pos) {
             // Location found, show map with these coordinates
-
+            
             var myloc = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
             drawMap(myloc);
-            calcdist(myloc);
+            getshops(function (data) {
+                if (data["d"] != undefined) {
+                    var shops = [];
+                    for (var i = 0; i < data["d"].length; i++)
+                        shops.push(data["d"][i])
+                }
+                
+                calcdist(myloc,shops);
 
-            drawmarkers(myloc);
+                drawmarkers(myloc,shops);
+            });
+           
         }
         function fail(error) {
+
             drawMap(defaultLatLng);  // Failed to find location, show default map
-            drawmarkers(defaultLatLng);
+
+            getshops(function (data) {
+                if (data["d"] != undefined) {
+                    var shops = [];
+                    for (var i = 0; i < data["d"].length; i++)
+                        shops.push(data["d"][i])
+                }
+               
+
+                drawmarkers(defaultLatLng, shops);
+            });
+            
             $('#message').text("Couldn't get location");
         }
         // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
@@ -42,10 +61,10 @@ $(document).on("pageinit", "#MapPage", function () {
 
     }
 
-    function codeAddress(callback) {
+    function codeAddress(shops,callback) {
 
 
-
+        
         var arr = [];
 
         for (var i = 0; i < shops.length; i++)
@@ -68,10 +87,12 @@ $(document).on("pageinit", "#MapPage", function () {
 
     }
 
+    function drawmarkers(loc,shops) {
+        
 
-    function drawmarkers(loc) {
+        debugger;
 
-        codeAddress(function (arr) {
+        codeAddress(shops,function (arr) {
             var map = new google.maps.Map(document.getElementById("gmap_canvas"), {
                 zoom: 10,
                 center: loc,
@@ -88,6 +109,7 @@ $(document).on("pageinit", "#MapPage", function () {
                
                 createMarker(add, arr[i].lat, arr[i].lng, infowindow, map, i);
             }
+           
             var marker = new google.maps.Marker({
                 position: loc,
                 map: map,
@@ -104,12 +126,10 @@ $(document).on("pageinit", "#MapPage", function () {
 
     }
 
+    function calcdist(myloc,shops) {
 
 
-    function calcdist(myloc) {
-
-
-        codeAddress(function (arr) {
+        codeAddress(shops,function (arr) {
 
             var distances = [];
             // var map = new google.maps.Map(document.getElementById("gmap_canvas"), {
@@ -127,25 +147,19 @@ $(document).on("pageinit", "#MapPage", function () {
                 add = title + shops[i].Name + '</br>' + shops[i].Adress + '</br>';
                 distances.push(google.maps.geometry.spherical.computeDistanceBetween(myloc, new google.maps.LatLng(arr[i].lat, arr[i].lng)));
                 //createMarker(add, arr[i].lat, arr[i].lng, infowindow, map, i);
+               
+                
             }
 
-
-
-
-           
             var x = getmin(distances);
 
             minimumindex = distances.indexOf(x);
             $('#message').text(shops[minimumindex].Name);
             $('#address').text(shops[minimumindex].Adress);
 
-
-
         });
 
     }
-
-
 
     function createMarker(add, lat, lng, infowindow, map, i) {
 
@@ -160,8 +174,6 @@ $(document).on("pageinit", "#MapPage", function () {
                 infowindow.open(map, marker);
             }
         })(marker, i));
-
-
 
     }
     var getmin = function (values) {

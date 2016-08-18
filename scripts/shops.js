@@ -55,14 +55,14 @@ function myshop(name) {
     location.reload();
 }
 
-function getshops() {
-    var shops = [];
+function getshops(callback) {
+  
     WebServiceURL = "http://proj.ruppin.ac.il/cegroup11/prod/" + "ShopsWS.asmx";
     $.support.cors = true;
     $.ajax({
         url: WebServiceURL + "/GetShops",
         dataType: "json",
-        async: false,
+       
         type: "POST",
         data: "",
         contentType: "application/json; charset=utf-8",
@@ -70,15 +70,8 @@ function getshops() {
             alert("errornir: " + JSON.stringify(err));
         },
         success: function (data) {
-            if (data["d"] != undefined) {
-                for (var i = 0; i < data["d"].length; i++)
-                    shops.push(data["d"][i])
-
-
-            }
-
-        }
+            callback(data);
+           }
     });
 
-    return shops;
 }
